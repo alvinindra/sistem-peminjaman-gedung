@@ -1,0 +1,25 @@
+.wrapper {
+  min-height: rem(900px);
+  background-size: cover;
+  background-position: center;
+  background-position-x: 450px;
+  background-image: url('/img/bg-login-sistem-peminjaman-gedung2.jpeg');
+}
+
+.form {
+  border-right: rem(1px) solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-7));
+  min-height: rem(900px);
+  max-width: rem(720px);
+  padding-top: rem(80px);
+
+  @media (max-width: $mantine-breakpoint-sm) {
+    max-width: 100%;
+  }
+}
+
+.title {
+  color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
+  font-family:
+    Greycliff CF,
+    var(--mantine-font-family);
+}
