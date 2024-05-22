@@ -9,4 +9,13 @@ export default withBundleAnalyzer({
   eslint: {
     ignoreDuringBuilds: true,
   },
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/dashboard/jadwal',
+        permanent: true,
+      },
+    ];
+  },
 });

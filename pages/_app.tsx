@@ -1,6 +1,7 @@
 import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';
-import '@/components/Layout/Sidebar.css';
+import '@/components/Layout/Sidebar.scss';
+import '@/public/global.scss';
 import type { AppProps } from 'next/app';
 import { useState, type ReactElement, type ReactNode } from 'react';
 import Head from 'next/head';
@@ -15,6 +16,8 @@ import {
   IconCalendarUser,
   IconUsersGroup,
 } from '@tabler/icons-react';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
 import { theme } from '../theme';
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
@@ -27,6 +30,7 @@ type AppPropsWithLayout = AppProps & {
 
 export default function App({ Component, pageProps }: AppPropsWithLayout) {
   const [isOnHover, setIsOnHover] = useState(false);
+  const router = useRouter();
 
   return (
     <MantineProvider theme={theme}>
@@ -44,12 +48,11 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
         ) : (
           <AppShell
             layout="alt"
-            header={{ height: 60 }}
             navbar={{
               width: 300,
               breakpoint: 'sm',
             }}
-            padding="md"
+            padding="xl"
           >
             <AppShell.Navbar
               className={clsx('sidebar', !isOnHover && 'close')}
@@ -85,25 +88,51 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
                 <div className="menu_items">
                   <ul className="menu_item">
                     <li className="item">
-                      <a href="#" className="link flex">
-                        <IconCalendar stroke={1.5} size={22} />
-                        <span>Jadwal</span>
-                      </a>
+                      <Link
+                        href="/dashboard/jadwal"
+                        className={clsx(
+                          'link flex',
+                          router.pathname === '/dashboard/jadwal' && 'active'
+                        )}
+                      >
+                        <div className="flex">
+                          <IconCalendar stroke={1.5} size={22} />
+                          <span>Jadwal</span>
+                        </div>
+                      </Link>
                     </li>
                     <li className="item">
-                      <a href="#" className="link flex">
+                      <a
+                        href="/dashboard/pengajuan"
+                        className={clsx(
+                          'link flex',
+                          router.pathname === '/dashboard/pengajuan' && 'active'
+                        )}
+                      >
                         <IconCalendarUser stroke={1.5} size={22} />
                         <span>Pengajuan</span>
                       </a>
                     </li>
                     <li className="item">
-                      <a href="#" className="link flex">
+                      <a
+                        href="/dashboard/kelola-gedung"
+                        className={clsx(
+                          'link flex',
+                          router.pathname === '/dashboard/kelola-gedung' && 'active'
+                        )}
+                      >
                         <IconBuildingSkyscraper stroke={1.5} size={22} />
                         <span>Kelola Gedung</span>
                       </a>
                     </li>
                     <li className="item">
-                      <a href="#" className="link flex">
+                      <a
+                        href="/dashboard/kelola-user"
+                        className={clsx(
+                          'link flex',
+                          router.pathname === '/dashboard/kelola-user' && 'active'
+                        )}
+                      >
                         <IconUsersGroup stroke={1.5} size={22} />
                         <span>Kelola User</span>
                       </a>

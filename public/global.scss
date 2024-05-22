@@ -1,0 +1,32 @@
+.mantine-AppShell-main {
+  background-color: #fbfbfb;
+}
+.mantine-Table-table {
+  border-radius: 8px;
+}
+.mantine-Table-tbody {
+  background-color: white;
+}
+.spgp-table-header {
+  background-color: #f7f8fc;
+
+  th {
+    font-weight: normal;
+  }
+}
+
+.mantine-Badge-root {
+  text-transform: capitalize;
+  padding: 5px 10.5px;
+  border-radius: 8px;
+  height: 28px;
+
+  .mantine-Badge-label {
+    font-size: 14px;
+    font-weight: 400;
+  }
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}

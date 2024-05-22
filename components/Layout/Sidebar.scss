@@ -103,18 +103,23 @@ ul {
   border-radius: 8px;
   padding: 8px 0;
   margin-bottom: 24px;
-  color: #3A3A3C;
+  color: #3a3a3c;
 }
 .link:hover {
   color: #fff;
-  background-color: #0ABBC3;
+  background-color: #0abbc3;
+}
+.link.active {
+  color: #fff;
+  background-color: #0abbc3;
 }
 .link span {
   white-space: nowrap;
   margin: auto 0 auto 8px;
   font-weight: bold;
 }
-.link i, .link svg {
+.link i,
+.link svg {
   height: 32px;
   min-width: 44px;
   display: flex;
