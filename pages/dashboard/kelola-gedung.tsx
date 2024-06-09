@@ -3,6 +3,7 @@ import {
   Button,
   Divider,
   Flex,
+  Grid,
   Input,
   Modal,
   Stack,
@@ -49,6 +50,7 @@ export default function KelolaUserPage() {
   });
 
   const [opened, { open, close }] = useDisclosure(false);
+  const [openedDetail, { open: openDetail, close: closeDetail }] = useDisclosure(false);
 
   const rows = elements.map((element) => (
     <Table.Tr key={element.nama_gedung}>
@@ -61,7 +63,7 @@ export default function KelolaUserPage() {
       </Table.Td>
       <Table.Td>
         <Flex gap={8}>
-          <IconEye className="cursor-pointer" color="#3A3A3C66" />
+          <IconEye className="cursor-pointer" color="#3A3A3C66" onClick={openDetail} />
           <IconEdit className="cursor-pointer" color="#3A3A3C66" />
           <IconTrash className="cursor-pointer" color="#3A3A3C66" />
         </Flex>
@@ -142,6 +144,52 @@ export default function KelolaUserPage() {
             Tambahkan Gedung <IconPlus size={16} style={{ marginLeft: '8px' }} color="white" />
           </Button>
         </form>
+      </Modal>
+
+      <Modal
+        opened={openedDetail}
+        onClose={closeDetail}
+        centered
+        size="lg"
+        padding={32}
+        title={
+          <Text size="md" fw={600}>
+            Detail Gedung A
+          </Text>
+        }
+      >
+        <Grid>
+          <Grid.Col span={12}>
+            <Text size="md" c="#3A3A3C99">
+              Nama Gedung
+            </Text>
+            <Text size="md" mt={8} mb={16}>
+              Gedung Serbaguna Sudirman
+            </Text>
+            <Text size="md" c="#3A3A3C99">
+              Lokasi Gedung
+            </Text>
+            <Text size="md" mt={8} mb={16}>
+              JL Jendral Sudirman
+            </Text>
+            <Text size="md" c="#3A3A3C99">
+              Deskripsi Gedung
+            </Text>
+            <Text size="md" mt={8} mb={16}>
+              Jumlah Ruang: 5
+              <br />
+              Fasilitas: <br />
+              - Kursi
+              <br />
+              - Proyektor
+              <br />
+              <br />
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Rem architecto dolores culpa
+              animi, maiores quo beatae soluta a voluptatibus doloremque nesciunt esse odit?
+              Officiis cupiditate sed saepe, perspiciatis veniam deserunt?
+            </Text>
+          </Grid.Col>
+        </Grid>
       </Modal>
     </>
   );
