@@ -114,6 +114,7 @@ export default function KelolaUserPage() {
           <Stack>
             <Divider />
             <TextInput
+              required
               label="Nama Lengkap"
               placeholder="Masukkan nama lengkap"
               value={form.values.name}

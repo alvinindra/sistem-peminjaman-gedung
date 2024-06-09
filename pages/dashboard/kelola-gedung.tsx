@@ -1,4 +1,19 @@
-import { Badge, Button, Flex, Input, Table, Title } from '@mantine/core';
+import {
+  Badge,
+  Button,
+  Divider,
+  Flex,
+  Input,
+  Modal,
+  Stack,
+  Table,
+  Text,
+  Textarea,
+  TextInput,
+  Title,
+} from '@mantine/core';
+import { useForm } from '@mantine/form';
+import { useDisclosure } from '@mantine/hooks';
 import { IconEdit, IconEye, IconPlus, IconSearch, IconTrash } from '@tabler/icons-react';
 
 const elements = [
@@ -25,6 +40,16 @@ const elements = [
 ];
 
 export default function KelolaUserPage() {
+  const form = useForm({
+    initialValues: {
+      name: '',
+      alamat: '',
+      deskripsi: '',
+    },
+  });
+
+  const [opened, { open, close }] = useDisclosure(false);
+
   const rows = elements.map((element) => (
     <Table.Tr key={element.nama_gedung}>
       <Table.Td>{element.nama_gedung}</Table.Td>
@@ -50,7 +75,7 @@ export default function KelolaUserPage() {
         <Title size={28}>Kelola Gedung</Title>
         <Flex gap={16}>
           <Input placeholder="Search..." leftSection={<IconSearch size={16} />} />
-          <Button variant="cyan">
+          <Button variant="cyan" onClick={open}>
             Tambahkan Gedung <IconPlus size={16} style={{ marginLeft: '8px' }} color="white" />
           </Button>
         </Flex>
@@ -72,6 +97,52 @@ export default function KelolaUserPage() {
         </Table.Thead>
         <Table.Tbody>{rows}</Table.Tbody>
       </Table>
+      <Modal
+        opened={opened}
+        onClose={close}
+        centered
+        padding={32}
+        title={
+          <Text size="md" fw={600}>
+            Form Tambah Gedung
+          </Text>
+        }
+      >
+        <form onSubmit={form.onSubmit(() => {})}>
+          <Stack>
+            <Divider />
+            <TextInput
+              required
+              label="Nama Gedung"
+              placeholder="Masukkan nama gedung"
+              value={form.values.name}
+              onChange={(event) => form.setFieldValue('name', event.currentTarget.value)}
+              radius="md"
+            />
+
+            <TextInput
+              required
+              label="Alamat"
+              placeholder="Masukkan alamat lengkap"
+              value={form.values.alamat}
+              onChange={(event) => form.setFieldValue('alamat', event.currentTarget.value)}
+              radius="md"
+            />
+
+            <Textarea
+              required
+              label="Deskripsi"
+              placeholder="Masukkan deskripsi"
+              value={form.values.deskripsi}
+              onChange={(event) => form.setFieldValue('deskripsi', event.currentTarget.value)}
+              radius="md"
+            />
+          </Stack>
+          <Button mt={24} color="cyan" type="submit" fullWidth>
+            Tambahkan Gedung <IconPlus size={16} style={{ marginLeft: '8px' }} color="white" />
+          </Button>
+        </form>
+      </Modal>
     </>
   );
 }
