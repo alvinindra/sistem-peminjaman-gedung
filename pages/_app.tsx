@@ -102,7 +102,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
                       </Link>
                     </li>
                     <li className="item">
-                      <a
+                      <Link
                         href="/dashboard/pengajuan"
                         className={clsx(
                           'link flex',
@@ -111,10 +111,10 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
                       >
                         <IconCalendarUser stroke={1.5} size={22} />
                         <span>Pengajuan</span>
-                      </a>
+                      </Link>
                     </li>
                     <li className="item">
-                      <a
+                      <Link
                         href="/dashboard/kelola-gedung"
                         className={clsx(
                           'link flex',
@@ -123,10 +123,10 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
                       >
                         <IconBuildingSkyscraper stroke={1.5} size={22} />
                         <span>Kelola Gedung</span>
-                      </a>
+                      </Link>
                     </li>
                     <li className="item">
-                      <a
+                      <Link
                         href="/dashboard/kelola-user"
                         className={clsx(
                           'link flex',
@@ -135,7 +135,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
                       >
                         <IconUsersGroup stroke={1.5} size={22} />
                         <span>Kelola User</span>
-                      </a>
+                      </Link>
                     </li>
                   </ul>
                 </div>
