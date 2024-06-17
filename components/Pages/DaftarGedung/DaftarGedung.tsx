@@ -10,8 +10,8 @@ export default function DaftarGedung() {
       </Text>
       <Grid>
         {[...Array(12)].map((item) => (
-          <Grid.Col key={item} span={{ base: 12, sm: 6, lg: 3 }}>
-            <Card shadow="xs" padding={12} component="a" href="/daftar-gedung">
+          <Grid.Col span={{ base: 12, sm: 6, lg: 3 }}>
+            <Card key={item} shadow="xs" padding={12} component="a" href="/daftar-gedung/1">
               <Card.Section>
                 <Image
                   src="/img/bg-login-sistem-peminjaman-gedung2.jpeg"
