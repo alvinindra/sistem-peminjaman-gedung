@@ -25,7 +25,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { theme } from '../theme';
 import { Notifications } from '@mantine/notifications';
 import { useGeneralStore } from '@/stores';
-import { apiClient } from '@/lib/api';
 import Cookies from 'js-cookie';
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
@@ -44,17 +43,11 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
   const { profile, setProfile } = useGeneralStore((state) => state);
 
   const handleLogout = async () => {
-    try {
-      await apiClient.post('/api');
-    } catch (error) {
-      console.error(error);
-    } finally {
-      Cookies.remove('token');
-      Cookies.remove('refresh');
-      Cookies.remove('role');
-      setProfile(null);
-      router.push('/login');
-    }
+    Cookies.remove('token');
+    Cookies.remove('refresh');
+    Cookies.remove('role');
+    setProfile(null);
+    router.push('/login');
   };
 
   return (

@@ -3,7 +3,6 @@ import Image from 'next/image';
 import UserMenu from '../UserMenu/UserMenu';
 import { IconExternalLink } from '@tabler/icons-react';
 import Cookies from 'js-cookie';
-import { apiClient } from '@/lib/api';
 import { useGeneralStore } from '@/stores';
 import { useRouter } from 'next/router';
 
@@ -12,17 +11,11 @@ export default function LayoutNavbar() {
   const { profile, setProfile } = useGeneralStore((state) => state);
 
   const handleLogout = async () => {
-    try {
-      await apiClient.post('/api');
-    } catch (error) {
-      console.error(error);
-    } finally {
-      Cookies.remove('token');
-      Cookies.remove('refresh');
-      Cookies.remove('role');
-      setProfile(null);
-      router.push('/login');
-    }
+    Cookies.remove('token');
+    Cookies.remove('refresh');
+    Cookies.remove('role');
+    setProfile(null);
+    router.push('/login');
   };
   return (
     <Container size="xl" my="auto">

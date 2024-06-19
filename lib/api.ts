@@ -24,3 +24,8 @@ apiClient.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+
+export async function getDaftarGedung() {
+  const data = await apiClient.get('/api/gedung/');
+  return data;
+}
