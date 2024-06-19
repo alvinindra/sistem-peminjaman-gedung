@@ -23,7 +23,7 @@ const UserMenu = forwardRef<HTMLButtonElement, UserButtonProps>(
         {/* <Avatar src={image} size={32} radius="xl" /> */}
 
         <div style={{ flex: 1 }}>
-          <Text size="sm" lineClamp={1} fw={500}>
+          <Text size="sm" lineClamp={1} fw={500} tt="capitalize">
             {name}
           </Text>
 
