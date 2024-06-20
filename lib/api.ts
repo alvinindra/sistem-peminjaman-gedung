@@ -29,3 +29,8 @@ export async function getDaftarGedung() {
   const data = await apiClient.get('/api/gedung/');
   return data;
 }
+
+export async function getAdminJadwal() {
+  const data = await apiClient.get('/api/reservasi');
+  return data;
+}

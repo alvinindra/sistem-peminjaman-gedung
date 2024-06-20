@@ -1,5 +1,10 @@
+import { getAdminJadwal } from '@/lib/api';
+import { formatDate } from '@/lib/helper';
 import { Badge, Flex, Input, Table, Title } from '@mantine/core';
+import { getFormattedDate } from '@mantine/dates';
 import { IconEye, IconSearch } from '@tabler/icons-react';
+import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 
 const elements = [
   {
@@ -35,32 +40,68 @@ const elements = [
 ];
 
 export default function JadwalPage() {
-  const rows = elements.map((element) => (
-    <Table.Tr key={element.nama_gedung}>
-      <Table.Td>{element.nama_gedung}</Table.Td>
-      <Table.Td>{element.tanggal_peminjam}</Table.Td>
-      <Table.Td>{element.peminjam}</Table.Td>
-      <Table.Td>{element.kegiatan}</Table.Td>
-      <Table.Td>
-        <Badge variant="outline" color="blue">
-          Berlangsung
-        </Badge>
-      </Table.Td>
-      <Table.Td>
-        <Flex gap={8}>
-          <IconEye className="cursor-pointer" color="#3A3A3C66" />
-          {/* <IconEdit className="cursor-pointer" color="#3A3A3C66" />
-          <IconTrash className="cursor-pointer" color="#3A3A3C66" /> */}
-        </Flex>
-      </Table.Td>
-    </Table.Tr>
-  ));
+  const [searchQuery, setSearchQuery] = useState('');
+  const { data, isLoading } = useQuery({
+    queryKey: ['data-jadwal'],
+    queryFn: getAdminJadwal,
+  });
+
+  const filteredData = data?.data?.filter(
+    (item: { nama_gedung: string; deskripsi_kegiatan: string }) =>
+      item?.nama_gedung?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item?.deskripsi_kegiatan?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const rows = filteredData?.map(
+    (item: {
+      id: number;
+      nama_gedung: string;
+      start_peminjaman: string;
+      end_peminjaman: string;
+      peminjam: string;
+      deskripsi_kegiatan: string;
+      status: string;
+    }) => (
+      <Table.Tr key={item.id}>
+        <Table.Td>{item?.nama_gedung}</Table.Td>
+        <Table.Td>{formatDate(item?.start_peminjaman, item?.end_peminjaman)}</Table.Td>
+        <Table.Td>{item?.peminjam}</Table.Td>
+        <Table.Td tt="capitalize">{item?.deskripsi_kegiatan}</Table.Td>
+        <Table.Td>
+          <Badge
+            variant="outline"
+            color={
+              item?.status?.toLowerCase() === 'rejected'
+                ? 'red'
+                : item?.status?.toLowerCase() === 'approved'
+                  ? 'blue'
+                  : 'green'
+            }
+          >
+            {item?.status}
+          </Badge>
+        </Table.Td>
+        {/*<Table.Td>
+          <Flex gap={8}>
+            <IconEye className="cursor-pointer" color="#3A3A3C66" />
+            <IconEdit className="cursor-pointer" color="#3A3A3C66" />
+          <IconTrash className="cursor-pointer" color="#3A3A3C66" />
+          </Flex>
+        </Table.Td> */}
+      </Table.Tr>
+    )
+  );
 
   return (
     <>
       <Flex justify="space-between" mb={24}>
         <Title size={28}>Jadwal Gedung</Title>
-        <Input placeholder="Search..." leftSection={<IconSearch size={16} />} />
+        <Input
+          placeholder="Search..."
+          leftSection={<IconSearch size={16} />}
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
       </Flex>
       <Table
         stickyHeader
@@ -76,7 +117,7 @@ export default function JadwalPage() {
             <Table.Th>Peminjam</Table.Th>
             <Table.Th>Kegiatan</Table.Th>
             <Table.Th>Status</Table.Th>
-            <Table.Th>Aksi</Table.Th>
+            {/* <Table.Th>Aksi</Table.Th> */}
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>{rows}</Table.Tbody>
