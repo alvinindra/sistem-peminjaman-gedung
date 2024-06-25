@@ -1,3 +1,4 @@
+import { getDaftarGedung } from '@/lib/api';
 import {
   Badge,
   Button,
@@ -16,29 +17,8 @@ import {
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { IconEdit, IconEye, IconPlus, IconSearch, IconTrash } from '@tabler/icons-react';
-
-const elements = [
-  {
-    alamat_gedung: 'Jln. Peckham House',
-    nama_gedung: 'Gedung A',
-  },
-  {
-    alamat_gedung: 'Jln. Peckham House',
-    nama_gedung: 'Gedung B',
-  },
-  {
-    alamat_gedung: 'Regent’s Canal',
-    nama_gedung: 'Gedung C',
-  },
-  {
-    alamat_gedung: 'Old Naval College',
-    nama_gedung: 'Gedung D',
-  },
-  {
-    alamat_gedung: 'Ezra Street Market',
-    nama_gedung: 'Gedung E',
-  },
-];
+import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 
 export default function KelolaUserPage() {
   const form = useForm({
@@ -51,32 +31,50 @@ export default function KelolaUserPage() {
 
   const [opened, { open, close }] = useDisclosure(false);
   const [openedDetail, { open: openDetail, close: closeDetail }] = useDisclosure(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['admin-data-gedung'],
+    queryFn: getDaftarGedung,
+  });
 
-  const rows = elements.map((element) => (
-    <Table.Tr key={element.nama_gedung}>
-      <Table.Td>{element.nama_gedung}</Table.Td>
-      <Table.Td>{element.alamat_gedung}</Table.Td>
-      <Table.Td>
+  const filteredData = data?.data?.filter(
+    (item: { nama: string; alamat: string }) =>
+      item.nama.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.alamat.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const rows = filteredData?.map(
+    (item: { image: string; id: number; nama: string; alamat: string }) => (
+      <Table.Tr key={item.id}>
+        <Table.Td tt="capitalize">{item.nama}</Table.Td>
+        <Table.Td tt="capitalize">{item.alamat}</Table.Td>
+        {/* <Table.Td>
         <Badge variant="outline" color="green">
           Aktif
         </Badge>
-      </Table.Td>
-      <Table.Td>
-        <Flex gap={8}>
-          <IconEye className="cursor-pointer" color="#3A3A3C66" onClick={openDetail} />
-          <IconEdit className="cursor-pointer" color="#3A3A3C66" />
-          <IconTrash className="cursor-pointer" color="#3A3A3C66" />
-        </Flex>
-      </Table.Td>
-    </Table.Tr>
-  ));
+      </Table.Td> */}
+        <Table.Td>
+          <Flex gap={8}>
+            <IconEye className="cursor-pointer" color="#3A3A3C66" onClick={openDetail} />
+            <IconEdit className="cursor-pointer" color="#3A3A3C66" />
+            <IconTrash className="cursor-pointer" color="#3A3A3C66" />
+          </Flex>
+        </Table.Td>
+      </Table.Tr>
+    )
+  );
 
   return (
     <>
       <Flex justify="space-between" mb={24}>
         <Title size={28}>Kelola Gedung</Title>
         <Flex gap={16}>
-          <Input placeholder="Search..." leftSection={<IconSearch size={16} />} />
+          <Input
+            placeholder="Search..."
+            leftSection={<IconSearch size={16} />}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
           <Button variant="cyan" onClick={open}>
             Tambahkan Gedung <IconPlus size={16} style={{ marginLeft: '8px' }} color="white" />
           </Button>
@@ -93,7 +91,7 @@ export default function KelolaUserPage() {
           <Table.Tr className="spgp-table-header">
             <Table.Th>Nama Gedung</Table.Th>
             <Table.Th>Alamat Gedung</Table.Th>
-            <Table.Th>Status</Table.Th>
+            {/* <Table.Th>Status</Table.Th> */}
             <Table.Th>Aksi</Table.Th>
           </Table.Tr>
         </Table.Thead>

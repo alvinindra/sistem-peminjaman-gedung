@@ -1,69 +1,69 @@
-import { Button, Flex, Input, Table, Title, Modal, Center, Text, Grid } from '@mantine/core';
+import { Button, Flex, Input, Table, Title, Modal, Center, Text, Grid, Paper } from '@mantine/core';
 import { IconPlus, IconSearch } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
-
-const elements = [
-  {
-    peminjam: 'Oliver',
-    kegiatan: 'Pernikahan',
-    tanggal_peminjam: '26 April 2024 08.00 - 12.00',
-    nama_gedung: 'Gedung A',
-  },
-  {
-    peminjam: 'Hadley',
-    kegiatan: 'Pernikahan',
-    tanggal_peminjam: '26 April 2024 08.00 - 12.00',
-    nama_gedung: 'Gedung B',
-  },
-  {
-    peminjam: 'Tom Hansen',
-    kegiatan: 'Depresi',
-    tanggal_peminjam: '27 April 2024 08.00 - 12.00',
-    nama_gedung: 'Gedung C',
-  },
-  {
-    peminjam: 'Summer',
-    kegiatan: 'Nangis',
-    tanggal_peminjam: '28 April 2024 08.00 - 12.00',
-    nama_gedung: 'Gedung D',
-  },
-  {
-    peminjam: 'Marianne',
-    kegiatan: 'Me Time',
-    tanggal_peminjam: '29 April 2024 08.00 - 12.00',
-    nama_gedung: 'Gedung E',
-  },
-];
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { getAdminJadwal } from '@/lib/api';
+import { formatDate } from '@/lib/helper';
 
 export default function PengajuanPage() {
   const [opened, { open, close }] = useDisclosure(false);
   const [openedTerima, { open: openTerima, close: closeTerima }] = useDisclosure(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const { data, isLoading } = useQuery({
+    queryKey: ['data-pengajuan-jadwal'],
+    queryFn: getAdminJadwal,
+  });
 
-  const rows = elements.map((element) => (
-    <Table.Tr key={element.nama_gedung}>
-      <Table.Td>{element.nama_gedung}</Table.Td>
-      <Table.Td>{element.tanggal_peminjam}</Table.Td>
-      <Table.Td>{element.peminjam}</Table.Td>
-      <Table.Td>{element.kegiatan}</Table.Td>
-      <Table.Td>
-        <Flex gap={8}>
-          <Button variant="light" color="gray" onClick={open}>
-            Tolak
-          </Button>
-          <Button color="green" onClick={openTerima}>
-            Terima
-          </Button>
-        </Flex>
-      </Table.Td>
-    </Table.Tr>
-  ));
+  const filteredData = data?.data?.filter(
+    (item: { id_gedung: any; deskripsi_kegiatan: string; status: string }) =>
+      (item?.id_gedung?.nama.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item?.deskripsi_kegiatan?.toLowerCase().includes(searchQuery.toLowerCase())) &&
+      item?.status?.toLowerCase() !== 'rejected'
+  );
+
+  const rows = filteredData?.map(
+    (item: {
+      id: number;
+      id_gedung: any;
+      start_peminjaman: string;
+      end_peminjaman: string;
+      id_peminjam: any;
+      deskripsi_kegiatan: string;
+      status: string;
+    }) => (
+      <Table.Tr key={item.id}>
+        <Table.Td tt="capitalize">{item?.id_gedung?.nama ? item?.id_gedung?.nama : '-'}</Table.Td>
+        <Table.Td>{formatDate(item?.start_peminjaman, item?.end_peminjaman)}</Table.Td>
+        <Table.Td tt="capitalize">
+          {item?.id_peminjam?.fullname ? item?.id_peminjam?.fullname : '-'}
+        </Table.Td>
+        <Table.Td tt="capitalize">{item?.deskripsi_kegiatan}</Table.Td>
+        <Table.Td>
+          <Flex gap={8}>
+            <Button variant="light" color="gray" onClick={open}>
+              Tolak
+            </Button>
+            <Button color="green" onClick={openTerima}>
+              Terima
+            </Button>
+          </Flex>
+        </Table.Td>
+      </Table.Tr>
+    )
+  );
 
   return (
     <>
       <Flex justify="space-between" mb={24}>
         <Title size={28}>Izin Peminjaman Gedung</Title>
         <Flex gap={16}>
-          <Input placeholder="Search..." leftSection={<IconSearch size={16} />} />
+          <Input
+            placeholder="Search..."
+            leftSection={<IconSearch size={16} />}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
           <Button color="cyan">
             Ajukan Peminjaman <IconPlus size={16} style={{ marginLeft: '8px' }} color="white" />
           </Button>
@@ -85,7 +85,23 @@ export default function PengajuanPage() {
             <Table.Th>Perizinan</Table.Th>
           </Table.Tr>
         </Table.Thead>
-        <Table.Tbody>{rows}</Table.Tbody>
+        <Table.Tbody>
+          {rows?.length > 0
+            ? rows
+            : rows?.length === 0 && (
+                <>
+                  <Table.Tr>
+                    <Table.Td colSpan={5}>
+                      <Paper p="xl" ta="center" w="100%">
+                        <Text fw={500} c="gray">
+                          Tidak ada data izin peminjaman gedung saat ini.
+                        </Text>
+                      </Paper>
+                    </Table.Td>
+                  </Table.Tr>
+                </>
+              )}
+        </Table.Tbody>
       </Table>
       <Modal opened={opened} onClose={close} centered padding={32}>
         <Center>

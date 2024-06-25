@@ -1,43 +1,9 @@
 import { getAdminJadwal } from '@/lib/api';
 import { formatDate } from '@/lib/helper';
-import { Badge, Flex, Input, Table, Title } from '@mantine/core';
-import { getFormattedDate } from '@mantine/dates';
+import { Badge, Flex, Input, Paper, Table, Text, Title } from '@mantine/core';
 import { IconEye, IconSearch } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
-
-const elements = [
-  {
-    peminjam: 'Oliver',
-    kegiatan: 'Pernikahan',
-    tanggal_peminjam: '26 April 2024 08.00 - 12.00',
-    nama_gedung: 'Gedung A',
-  },
-  {
-    peminjam: 'Hadley',
-    kegiatan: 'Pernikahan',
-    tanggal_peminjam: '26 April 2024 08.00 - 12.00',
-    nama_gedung: 'Gedung B',
-  },
-  {
-    peminjam: 'Tom Hansen',
-    kegiatan: 'Depresi',
-    tanggal_peminjam: '27 April 2024 08.00 - 12.00',
-    nama_gedung: 'Gedung C',
-  },
-  {
-    peminjam: 'Summer',
-    kegiatan: 'Nangis',
-    tanggal_peminjam: '28 April 2024 08.00 - 12.00',
-    nama_gedung: 'Gedung D',
-  },
-  {
-    peminjam: 'Marianne',
-    kegiatan: 'Me Time',
-    tanggal_peminjam: '29 April 2024 08.00 - 12.00',
-    nama_gedung: 'Gedung E',
-  },
-];
 
 export default function JadwalPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -47,25 +13,27 @@ export default function JadwalPage() {
   });
 
   const filteredData = data?.data?.filter(
-    (item: { nama_gedung: string; deskripsi_kegiatan: string }) =>
-      item?.nama_gedung?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (item: { id_gedung: any; deskripsi_kegiatan: string; status: string }) =>
+      item?.id_gedung?.nama.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item?.deskripsi_kegiatan?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const rows = filteredData?.map(
     (item: {
       id: number;
-      nama_gedung: string;
+      id_gedung: any;
       start_peminjaman: string;
       end_peminjaman: string;
-      peminjam: string;
+      id_peminjam: any;
       deskripsi_kegiatan: string;
       status: string;
     }) => (
       <Table.Tr key={item.id}>
-        <Table.Td>{item?.nama_gedung}</Table.Td>
+        <Table.Td tt="capitalize">{item?.id_gedung?.nama ? item?.id_gedung?.nama : '-'}</Table.Td>
         <Table.Td>{formatDate(item?.start_peminjaman, item?.end_peminjaman)}</Table.Td>
-        <Table.Td>{item?.peminjam}</Table.Td>
+        <Table.Td tt="capitalize">
+          {item?.id_peminjam?.fullname ? item?.id_peminjam?.fullname : '-'}
+        </Table.Td>
         <Table.Td tt="capitalize">{item?.deskripsi_kegiatan}</Table.Td>
         <Table.Td>
           <Badge
@@ -120,7 +88,23 @@ export default function JadwalPage() {
             {/* <Table.Th>Aksi</Table.Th> */}
           </Table.Tr>
         </Table.Thead>
-        <Table.Tbody>{rows}</Table.Tbody>
+        <Table.Tbody>
+          {rows?.length > 0
+            ? rows
+            : rows?.length === 0 && (
+                <>
+                  <Table.Tr>
+                    <Table.Td colSpan={5}>
+                      <Paper p="xl" ta="center" w="100%">
+                        <Text fw={500} c="gray">
+                          Tidak ada data jadwal gedung.
+                        </Text>
+                      </Paper>
+                    </Table.Td>
+                  </Table.Tr>
+                </>
+              )}
+        </Table.Tbody>
       </Table>
     </>
   );
