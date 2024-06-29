@@ -1,4 +1,6 @@
 import { getDaftarGedung } from '@/lib/api';
+import { createBuilding } from '@/services/building/createBuilding';
+import { getBuildings } from '@/services/building/getBuildings';
 import {
   Badge,
   Button,
@@ -29,13 +31,25 @@ export default function KelolaUserPage() {
     },
   });
 
+  const handleGetBuildings = async () => {
+    try {
+      const response = await getBuildings();
+      return response
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  const [buildings, setBuildings] = useState([]);
   const [opened, { open, close }] = useDisclosure(false);
   const [openedDetail, { open: openDetail, close: closeDetail }] = useDisclosure(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['admin-data-gedung'],
-    queryFn: getDaftarGedung,
+    queryFn: handleGetBuildings,
   });
+
+
 
   const filteredData = data?.data?.filter(
     (item: { nama: string; alamat: string }) =>
@@ -63,6 +77,20 @@ export default function KelolaUserPage() {
       </Table.Tr>
     )
   );
+
+  const handleCreateBuilding = async () => {
+    try {
+     const response = await createBuilding({
+      nama: form.values.name,
+      alamat: form.values.alamat,
+     });
+
+     refetch();
+     console.log(response)
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   return (
     <>
@@ -108,7 +136,7 @@ export default function KelolaUserPage() {
           </Text>
         }
       >
-        <form onSubmit={form.onSubmit(() => {})}>
+        <form onSubmit={form.onSubmit(() => {handleCreateBuilding()})}>
           <Stack>
             <Divider />
             <TextInput
@@ -129,14 +157,14 @@ export default function KelolaUserPage() {
               radius="md"
             />
 
-            <Textarea
+            {/* <Textarea
               required
               label="Deskripsi"
               placeholder="Masukkan deskripsi"
               value={form.values.deskripsi}
               onChange={(event) => form.setFieldValue('deskripsi', event.currentTarget.value)}
               radius="md"
-            />
+            /> */}
           </Stack>
           <Button mt={24} color="cyan" type="submit" fullWidth>
             Tambahkan Gedung <IconPlus size={16} style={{ marginLeft: '8px' }} color="white" />

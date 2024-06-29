@@ -1,8 +1,8 @@
 import { apiClient } from '@/lib/api';
 
-export async function createUser(data: any) {
+export async function editBuilding(data: any, id: any) {
     return apiClient({
-        url: '/api/register/',
+        url: '/api/gedung/' + id,
         method: 'post',
         data,
     });

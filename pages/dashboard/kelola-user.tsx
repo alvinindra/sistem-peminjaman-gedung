@@ -22,6 +22,7 @@ import { createUser } from '@/services/user/createUser';
 import { getUsers } from '@/services/user/getUser';
 import { editUser } from '@/services/user/editUser';
 import { deleteUser } from '@/services/user/deleteUser';
+import { notifications } from '@mantine/notifications';
 
 export default function KelolaUserPage() {
   const form = useForm({
@@ -61,7 +62,6 @@ export default function KelolaUserPage() {
       const response = await getUsers();
 
       setUsers(response.data);
-      console.log(response);
     } catch (error: any) {
       console.log(error);
     }
@@ -78,9 +78,20 @@ export default function KelolaUserPage() {
 
       const response = await createUser(payload);
 
-      console.log(response);
+      if (response.status === 201) {
+        notifications.show({
+          title: 'User Berhasil Dibuat',
+          message: '',
+        });
+        close();
+        handleGetUser();
+      }
     } catch (error: any) {
-      console.log(error);
+      notifications.show({
+        title: 'User Gagal Dibuat',
+        message: error.response.data.message || 'Silakan coba lagi',
+        color: 'red',
+      });
     }
   };
 
@@ -94,19 +105,41 @@ export default function KelolaUserPage() {
 
       const response = await editUser(payload, selectedUser.id);
 
-      console.log(response);
+      if (response.status === 200) {
+        notifications.show({
+          title: 'User Berhasil Diubah',
+          message: '',
+        });
+        closeEdit();
+        handleGetUser();
+      }
     } catch (error: any) {
-      console.log(error);
+      notifications.show({
+        title: 'User Gagal Diubah',
+        message: error.response.data.message || 'Silakan coba lagi',
+        color: 'red',
+      });
     }
   };
 
   const handleDeleteUser = async () => {
     try {
       const response = await deleteUser({ id: selectedUser.id });
+      if (response.status === 204) {
+        notifications.show({
+          title: 'User Berhasil Dihapus',
+          message: '',
+        });
+        closeDelete();
+        handleGetUser();
+      }
 
-      console.log(response);
     } catch (error: any) {
-      console.log(error);
+      notifications.show({
+        title: 'User Gagal Dihapus',
+        message: error.response.data.message || 'Silakan coba lagi',
+        color: 'red',
+      });
     }
   };
 
@@ -130,7 +163,7 @@ export default function KelolaUserPage() {
   }, []);
 
   const rows = users.map((user : any) => (
-    <Table.Tr key={user.nama_pengguna}>
+    <Table.Tr key={user.id}>
       <Table.Td>{user.fullname}</Table.Td>
       <Table.Td>{user.username}</Table.Td>
       <Table.Td>{user.role}</Table.Td>
@@ -189,7 +222,7 @@ export default function KelolaUserPage() {
           </Text>
         }
       >
-        <form onSubmit={form.onSubmit(() => { handleAddUser(); })}>
+        <form>
           <Stack>
             <Divider />
             <TextInput
@@ -215,7 +248,7 @@ export default function KelolaUserPage() {
               label="Role"
               placeholder="Pilih role"
               value={form.values.role}
-              data={[{ value: 'Peminjam', label: 'Administration' }]}
+              data={[{ value: 'Admin', label: 'Administration' }, { value: 'Peminjam', label: 'Peminjam' }]}
               onChange={(_value, option) => form.setFieldValue('role', option.value)}
               radius="md"
             />
@@ -239,7 +272,7 @@ export default function KelolaUserPage() {
               radius="md"
             />
           </Stack>
-          <Button mt={24} color="cyan" type="submit" fullWidth>
+          <Button mt={24} color="cyan" type="button" fullWidth onClick={() => { handleAddUser(); }}>
             Tambahkan Pengguna <IconPlus size={16} style={{ marginLeft: '8px' }} color="white" />
           </Button>
         </form>
@@ -281,7 +314,7 @@ export default function KelolaUserPage() {
               label="Role"
               placeholder="Pilih role"
               value={formEdit.values.role}
-              data={[{ value: 'Peminjam', label: 'Administration' }]}
+              data={[{ value: 'Admin', label: 'Administration' }, { value: 'Peminjam', label: 'Peminjam' }]}
               onChange={(_value, option) => formEdit.setFieldValue('role', option.value)}
               radius="md"
             />
