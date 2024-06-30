@@ -10,16 +10,22 @@ import {
   TextInput,
   Stack,
   Modal,
+  Select,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { DateTimePicker } from '@mantine/dates';
+import { useParams } from 'next/navigation';
+import { useEffect } from 'react';
 import DetailGedungCalendar from './DetailGedungCalendar';
+import { getBuilding } from '@/services/building/getBuilding';
+import { requestReservation } from '@/services/reservation/requestReservation';
+import { useGeneralStore } from '@/stores';
+import { notifications } from '@mantine/notifications';
 
 export default function DetailGedung() {
   const form = useForm({
     initialValues: {
-      name: '',
       start_peminjaman: '',
       end_peminjaman: '',
       deskripsi_kegiatan: '',
@@ -28,6 +34,53 @@ export default function DetailGedung() {
 
   const [opened, { open, close }] = useDisclosure(false);
 
+  const params = useParams();
+
+  const {profile } = useGeneralStore();
+
+  const handleGetBuilding = () => {
+    try {
+      const { id } = params;
+      const response = getBuilding(id);
+
+      console.log(response);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleRequestReservation = () => {
+    try {
+      const { id } = params;
+      const response = requestReservation({
+        ...form.values,
+        id_gedung: id,
+
+      });
+
+      if (response.status === 201) {
+        notifications.show({
+          title: 'Berhasil mengajukan peminjaman',
+        });
+      }
+
+    } catch (error) {
+     
+      notifications.show({
+        title: 'Gagal mengajukan peminjaman',
+        message: 'Silahkan coba lagi',
+
+      });
+    } finally {
+      close();
+
+    }
+  
+  }
+
+  useEffect(() => {
+    // handleGetBuilding();
+  }, []);
   return (
     <>
       <Container size="xl" pt={110}>
@@ -104,29 +157,24 @@ export default function DetailGedung() {
           </Text>
         }
       >
-        <form onSubmit={form.onSubmit(() => {})}>
+        <form>
           <Stack>
             <Divider />
-            <TextInput
-              required
-              label="Gedung"
-              placeholder="Masukkan nama gedung"
-              disabled
-              value="Gedung Sederhana Sudirman"
-              onChange={(event) => form.setFieldValue('name', event.currentTarget.value)}
-              radius="md"
-            />
 
             <DateTimePicker
               valueFormat="DD MMM YYYY hh:mm A"
               label="Tanggal Mulai Peminjaman"
               placeholder="Pilih Tanggal Mulai Peminjaman"
+              value={form.values.start_peminjaman}
+              onChange={(value) => form.setFieldValue('start_peminjaman', value)}
             />
 
             <DateTimePicker
               valueFormat="DD MMM YYYY hh:mm A"
               label="Tanggal Akhir Peminjaman"
               placeholder="Pilih Tanggal Mulai Peminjaman"
+              value={form.values.end_peminjaman}
+              onChange={(value) => form.setFieldValue('end_peminjaman', value)}
             />
 
             <TextInput
@@ -140,7 +188,7 @@ export default function DetailGedung() {
               radius="md"
             />
           </Stack>
-          <Button mt={24} color="cyan" type="submit" fullWidth>
+          <Button mt={24} color="cyan" type="button" onClick={() => { handleRequestReservation(); }} fullWidth>
             Ajukan Peminjaman
           </Button>
         </form>

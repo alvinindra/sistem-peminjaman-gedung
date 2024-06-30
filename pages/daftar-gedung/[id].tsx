@@ -10,7 +10,6 @@ const DetailGedung = dynamic(() => import('@/components/Pages/DetailGedung/Detai
 export default function DetailGedungPage() {
   return (
     <>
-      <Suspense>
         <AppShell header={{ height: 73, offset: false }} padding="md">
           <AppShell.Header>
             <LayoutNavbar />
@@ -20,7 +19,6 @@ export default function DetailGedungPage() {
             <DetailGedung />
           </div>
         </AppShell>
-      </Suspense>
     </>
   );
 }

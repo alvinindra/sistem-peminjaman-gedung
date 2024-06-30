@@ -1,9 +1,8 @@
 import { apiClient } from '@/lib/api';
 
-export async function getReservations(data: any) {
+export async function getReservations() {
     return apiClient({
-        url: '/api/reservasi/',
+        url: '/api/reservasi',
         method: 'get',
-        data,
     });
 }
