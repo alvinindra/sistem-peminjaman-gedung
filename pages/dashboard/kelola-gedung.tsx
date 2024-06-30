@@ -1,6 +1,3 @@
-import { getDaftarGedung } from '@/lib/api';
-import { createBuilding } from '@/services/building/createBuilding';
-import { getBuildings } from '@/services/building/getBuildings';
 import {
   Badge,
   Button,
@@ -18,9 +15,16 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
+import { notifications } from '@mantine/notifications';
 import { IconEdit, IconEye, IconPlus, IconSearch, IconTrash } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
+import { getBuildings } from '@/services/building/getBuildings';
+import { createBuilding } from '@/services/building/createBuilding';
+import { getDaftarGedung } from '@/lib/api';
+import { editBuilding } from '@/services/building/editBuilding';
+import { deleteBuildings } from '@/services/building/deleteBuilding';
+import { getBuilding } from '@/services/building/getBuilding';
 
 export default function KelolaUserPage() {
   const form = useForm({
@@ -31,25 +35,36 @@ export default function KelolaUserPage() {
     },
   });
 
+  const formEdit = useForm({
+    initialValues: {
+      name: '',
+      alamat: '',
+      deskripsi: '',
+    },
+  });
+
   const handleGetBuildings = async () => {
     try {
       const response = await getBuildings();
-      return response
+      return response;
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 
   const [buildings, setBuildings] = useState([]);
+  const [selectedBuilding, setSelectedBuilding] = useState({} as any);
+  
   const [opened, { open, close }] = useDisclosure(false);
   const [openedDetail, { open: openDetail, close: closeDetail }] = useDisclosure(false);
+  const [openedEdit, { open: openEdit, close: closeEdit }] = useDisclosure(false);
+  const [openedDelete, { open: openDelete, close: closeDelete }] = useDisclosure(false);
+
   const [searchQuery, setSearchQuery] = useState('');
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['admin-data-gedung'],
     queryFn: handleGetBuildings,
   });
-
-
 
   const filteredData = data?.data?.filter(
     (item: { nama: string; alamat: string }) =>
@@ -57,26 +72,48 @@ export default function KelolaUserPage() {
       item.alamat.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // const handleGetDetailBuilding = async (id: number) => {
+  //   try {
+  //     const response = await getBuilding(id);
+
+  //     return response;
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // }
+
+  const handleSetSelected = (building: any, type = 'detail') => {
+    setSelectedBuilding(building);
+
+    if (type === 'edit') {
+      formEdit.setFieldValue('name', building.nama);
+      formEdit.setFieldValue('alamat', building.alamat);
+      formEdit.setFieldValue('deskripsi', building.deskripsi);
+      openEdit();
+    } else if (type === 'delete') {
+      openDelete();
+    } else if (type === 'detail') {
+      // handleGetDetailBuilding(building.id);
+      openDetail();
+    }
+  };
+
   const rows = filteredData?.map(
-    (item: { image: string; id: number; nama: string; alamat: string }) => (
+    (item: { id: number; nama: string; alamat: string }) => (
       <Table.Tr key={item.id}>
         <Table.Td tt="capitalize">{item.nama}</Table.Td>
         <Table.Td tt="capitalize">{item.alamat}</Table.Td>
-        {/* <Table.Td>
-        <Badge variant="outline" color="green">
-          Aktif
-        </Badge>
-      </Table.Td> */}
         <Table.Td>
           <Flex gap={8}>
-            <IconEye className="cursor-pointer" color="#3A3A3C66" onClick={openDetail} />
-            <IconEdit className="cursor-pointer" color="#3A3A3C66" />
-            <IconTrash className="cursor-pointer" color="#3A3A3C66" />
+            <IconEye className="cursor-pointer" color="#3A3A3C66" onClick={() => handleSetSelected(item, 'detail')} />
+            <IconEdit className="cursor-pointer" color="#3A3A3C66" onClick={() => handleSetSelected(item, 'edit')} />
+            <IconTrash className="cursor-pointer" color="#3A3A3C66" onClick={() => handleSetSelected(item, 'delete')} />
           </Flex>
         </Table.Td>
       </Table.Tr>
     )
   );
+
 
   const handleCreateBuilding = async () => {
     try {
@@ -85,12 +122,71 @@ export default function KelolaUserPage() {
       alamat: form.values.alamat,
      });
 
-     refetch();
-     console.log(response)
+     if (response.status === 201) {
+      notifications.show({
+        title: 'Berhasil menambahkan gedung',
+        message: '',
+      });
+       close();
+       refetch();
+     }
     } catch (error) {
-      console.error(error);
+      notifications.show({
+        title: 'Gagal menambahkan gedung',
+        message: 'Silakan coba lagi',
+        color: 'red',
+      });
     }
-  }
+  };
+
+
+  const handleEditBuilding = async () => {
+    try {
+      const payload = {
+        nama: formEdit.values.name,
+        alamat: formEdit.values.alamat,
+        deskripsi: formEdit.values.deskripsi,
+      };
+
+      const response = await editBuilding(payload, selectedBuilding.id);
+
+      if (response.status === 200) {
+        notifications.show({
+          title: 'Gedung Berhasil Diubah',
+          message: '',
+        });
+        closeEdit();
+        refetch();
+      }
+    } catch (error: any) {
+      notifications.show({
+        title: 'Gedung Gagal Diubah',
+        message: error.response.data.message || 'Silakan coba lagi',
+        color: 'red',
+      });
+    }
+  };
+
+  const handleDeleteBuilding = async () => {
+    try {
+      const response = await deleteBuildings({ id: selectedBuilding.id });
+      if (response.status === 204) {
+        notifications.show({
+          title: 'Gedung Berhasil Dihapus',
+          message: '',
+        });
+        closeDelete();
+        refetch();
+      }
+    } catch (error: any) {
+      notifications.show({
+        title: 'Gedung Gagal Dihapus',
+        message: error.response.data.message || 'Silakan coba lagi',
+        color: 'red',
+      });
+    }
+  };
+
 
   return (
     <>
@@ -136,7 +232,7 @@ export default function KelolaUserPage() {
           </Text>
         }
       >
-        <form onSubmit={form.onSubmit(() => {handleCreateBuilding()})}>
+        <form onSubmit={form.onSubmit(() => { handleCreateBuilding(); })}>
           <Stack>
             <Divider />
             <TextInput
@@ -171,6 +267,52 @@ export default function KelolaUserPage() {
           </Button>
         </form>
       </Modal>
+      <Modal
+        opened={openedEdit}
+        onClose={closeEdit}
+        centered
+        padding={32}
+        title={
+          <Text size="md" fw={600}>
+            Form Edit Gedung
+          </Text>
+        }
+      >
+        <form onSubmit={formEdit.onSubmit(() => { handleEditBuilding(); })}>
+          <Stack>
+            <Divider />
+            <TextInput
+              required
+              label="Nama Gedung"
+              placeholder="Masukkan nama gedung"
+              value={formEdit.values.name}
+              onChange={(event) => formEdit.setFieldValue('name', event.currentTarget.value)}
+              radius="md"
+            />
+
+            <TextInput
+              required
+              label="Alamat"
+              placeholder="Masukkan alamat lengkap"
+              value={formEdit.values.alamat}
+              onChange={(event) => formEdit.setFieldValue('alamat', event.currentTarget.value)}
+              radius="md"
+            />
+
+            {/* <Textarea
+              required
+              label="Deskripsi"
+              placeholder="Masukkan deskripsi"
+              value={formEdit.values.deskripsi}
+              onChange={(event) => formEdit.setFieldValue('deskripsi', event.currentTarget.value)}
+              radius="md"
+            /> */}
+          </Stack>
+          <Button mt={24} color="cyan" type="submit" fullWidth>
+            Edit Gedung <IconPlus size={16} style={{ marginLeft: '8px' }} color="white" />
+          </Button>
+        </form>
+      </Modal>
 
       <Modal
         opened={openedDetail}
@@ -180,7 +322,7 @@ export default function KelolaUserPage() {
         padding={32}
         title={
           <Text size="md" fw={600}>
-            Detail Gedung A
+            Detail Gedung {selectedBuilding.nama}
           </Text>
         }
       >
@@ -190,15 +332,15 @@ export default function KelolaUserPage() {
               Nama Gedung
             </Text>
             <Text size="md" mt={8} mb={16}>
-              Gedung Serbaguna Sudirman
+              {selectedBuilding.nama}
             </Text>
             <Text size="md" c="#3A3A3C99">
               Lokasi Gedung
             </Text>
             <Text size="md" mt={8} mb={16}>
-              JL Jendral Sudirman
+              {selectedBuilding.alamat}
             </Text>
-            <Text size="md" c="#3A3A3C99">
+            {/* <Text size="md" c="#3A3A3C99">
               Deskripsi Gedung
             </Text>
             <Text size="md" mt={8} mb={16}>
@@ -213,9 +355,25 @@ export default function KelolaUserPage() {
               Lorem ipsum dolor sit amet, consectetur adipisicing elit. Rem architecto dolores culpa
               animi, maiores quo beatae soluta a voluptatibus doloremque nesciunt esse odit?
               Officiis cupiditate sed saepe, perspiciatis veniam deserunt?
-            </Text>
+            </Text> */}
           </Grid.Col>
         </Grid>
+      </Modal>
+      <Modal
+        opened={openedDelete}
+        onClose={closeDelete}
+        centered
+        padding={32}
+        title={
+          <Text size="md" fw={600}>
+            Hapus Gedung
+          </Text>
+        }
+      >
+        <Text>Apakah anda yakin ingin menghapus Gedung ini?</Text>
+        <Button mt={24} color="red" fullWidth onClick={() => { handleDeleteBuilding(); }}>
+          Hapus Gedung <IconTrash size={16} style={{ marginLeft: '8px' }} color="white" />
+        </Button>
       </Modal>
     </>
   );
