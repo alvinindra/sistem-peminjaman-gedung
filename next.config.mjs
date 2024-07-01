@@ -6,7 +6,7 @@ const withBundleAnalyzer = bundleAnalyzer({
 
 export default withBundleAnalyzer({
   env: {
-    API_URL: process.env.API_URL || 'https://egov.fmaulanadaily.my.id',
+    API_URL: process.env.API_URL || 'https://fajar-uas.sirclo.net.dmmy.me/',
   },
   reactStrictMode: false,
   eslint: {

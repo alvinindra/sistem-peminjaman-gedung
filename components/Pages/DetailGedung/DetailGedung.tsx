@@ -36,7 +36,7 @@ export default function DetailGedung() {
 
   const params = useParams();
 
-  const {profile } = useGeneralStore();
+  const { profile } = useGeneralStore();
 
   const handleGetBuilding = () => {
     try {
@@ -49,34 +49,29 @@ export default function DetailGedung() {
     }
   };
 
-  const handleRequestReservation = () => {
+  const handleRequestReservation = async () => {
     try {
       const { id } = params;
-      const response = requestReservation({
+      const response = await requestReservation({
         ...form.values,
         id_gedung: id,
-
       });
 
-      if (response.status === 201) {
+      if (response?.status === 201) {
         notifications.show({
           title: 'Berhasil mengajukan peminjaman',
+          message: '',
         });
       }
-
     } catch (error) {
-     
       notifications.show({
         title: 'Gagal mengajukan peminjaman',
         message: 'Silahkan coba lagi',
-
       });
     } finally {
       close();
-
     }
-  
-  }
+  };
 
   useEffect(() => {
     // handleGetBuilding();
@@ -165,16 +160,16 @@ export default function DetailGedung() {
               valueFormat="DD MMM YYYY hh:mm A"
               label="Tanggal Mulai Peminjaman"
               placeholder="Pilih Tanggal Mulai Peminjaman"
-              value={form.values.start_peminjaman}
-              onChange={(value) => form.setFieldValue('start_peminjaman', value)}
+              value={form.values.start_peminjaman as any}
+              onChange={(value: any) => form.setFieldValue('start_peminjaman', value)}
             />
 
             <DateTimePicker
               valueFormat="DD MMM YYYY hh:mm A"
               label="Tanggal Akhir Peminjaman"
               placeholder="Pilih Tanggal Mulai Peminjaman"
-              value={form.values.end_peminjaman}
-              onChange={(value) => form.setFieldValue('end_peminjaman', value)}
+              value={form.values.end_peminjaman as any}
+              onChange={(value: any) => form.setFieldValue('end_peminjaman', value)}
             />
 
             <TextInput
@@ -188,7 +183,15 @@ export default function DetailGedung() {
               radius="md"
             />
           </Stack>
-          <Button mt={24} color="cyan" type="button" onClick={() => { handleRequestReservation(); }} fullWidth>
+          <Button
+            mt={24}
+            color="cyan"
+            type="button"
+            onClick={() => {
+              handleRequestReservation();
+            }}
+            fullWidth
+          >
             Ajukan Peminjaman
           </Button>
         </form>

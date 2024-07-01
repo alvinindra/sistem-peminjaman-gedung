@@ -47,7 +47,7 @@ export default function KelolaUserPage() {
     fullname: '',
     username: '',
     role: '',
-  });
+  } as any);
 
   const [opened, { open, close }] = useDisclosure(false);
   const [openedEdit, { open: openEdit, close: closeEdit }] = useDisclosure(false);
@@ -78,7 +78,7 @@ export default function KelolaUserPage() {
 
       const response = await createUser(payload);
 
-      if (response.status === 201) {
+      if (response?.status === 201) {
         notifications.show({
           title: 'User Berhasil Dibuat',
           message: '',
@@ -105,7 +105,7 @@ export default function KelolaUserPage() {
 
       const response = await editUser(payload, selectedUser.id);
 
-      if (response.status === 200) {
+      if (response?.status === 200) {
         notifications.show({
           title: 'User Berhasil Diubah',
           message: '',
@@ -125,7 +125,7 @@ export default function KelolaUserPage() {
   const handleDeleteUser = async () => {
     try {
       const response = await deleteUser({ id: selectedUser.id });
-      if (response.status === 204) {
+      if (response?.status === 204) {
         notifications.show({
           title: 'User Berhasil Dihapus',
           message: '',
@@ -133,7 +133,6 @@ export default function KelolaUserPage() {
         closeDelete();
         handleGetUser();
       }
-
     } catch (error: any) {
       notifications.show({
         title: 'User Gagal Dihapus',
@@ -162,7 +161,7 @@ export default function KelolaUserPage() {
     handleGetUser();
   }, []);
 
-  const rows = users.map((user : any) => (
+  const rows = users.map((user: any) => (
     <Table.Tr key={user.id}>
       <Table.Td>{user.fullname}</Table.Td>
       <Table.Td>{user.username}</Table.Td>
@@ -174,9 +173,27 @@ export default function KelolaUserPage() {
       </Table.Td>
       <Table.Td>
         <Flex gap={8}>
-          <IconEye className="cursor-pointer" color="#3A3A3C66" onClick={() => { handleSetSelected(user, 'detail'); }} />
-            <IconEdit className="cursor-pointer" color="#3A3A3C66" onClick={() => { handleSetSelected(user, 'edit'); }} />
-          <IconTrash className="cursor-pointer" color="#3A3A3C66" onClick={() => { handleSetSelected(user, 'delete'); }} />
+          <IconEye
+            className="cursor-pointer"
+            color="#3A3A3C66"
+            onClick={() => {
+              handleSetSelected(user, 'detail');
+            }}
+          />
+          <IconEdit
+            className="cursor-pointer"
+            color="#3A3A3C66"
+            onClick={() => {
+              handleSetSelected(user, 'edit');
+            }}
+          />
+          <IconTrash
+            className="cursor-pointer"
+            color="#3A3A3C66"
+            onClick={() => {
+              handleSetSelected(user, 'delete');
+            }}
+          />
         </Flex>
       </Table.Td>
     </Table.Tr>
@@ -248,7 +265,10 @@ export default function KelolaUserPage() {
               label="Role"
               placeholder="Pilih role"
               value={form.values.role}
-              data={[{ value: 'Admin', label: 'Administration' }, { value: 'Peminjam', label: 'Peminjam' }]}
+              data={[
+                { value: 'Admin', label: 'Administration' },
+                { value: 'Peminjam', label: 'Peminjam' },
+              ]}
               onChange={(_value, option) => form.setFieldValue('role', option.value)}
               radius="md"
             />
@@ -272,7 +292,15 @@ export default function KelolaUserPage() {
               radius="md"
             />
           </Stack>
-          <Button mt={24} color="cyan" type="button" fullWidth onClick={() => { handleAddUser(); }}>
+          <Button
+            mt={24}
+            color="cyan"
+            type="button"
+            fullWidth
+            onClick={() => {
+              handleAddUser();
+            }}
+          >
             Tambahkan Pengguna <IconPlus size={16} style={{ marginLeft: '8px' }} color="white" />
           </Button>
         </form>
@@ -288,7 +316,11 @@ export default function KelolaUserPage() {
           </Text>
         }
       >
-        <form onSubmit={formEdit.onSubmit(() => { handleEditUser(); })}>
+        <form
+          onSubmit={formEdit.onSubmit(() => {
+            handleEditUser();
+          })}
+        >
           <Stack>
             <Divider />
             <TextInput
@@ -314,11 +346,13 @@ export default function KelolaUserPage() {
               label="Role"
               placeholder="Pilih role"
               value={formEdit.values.role}
-              data={[{ value: 'Admin', label: 'Administration' }, { value: 'Peminjam', label: 'Peminjam' }]}
+              data={[
+                { value: 'Admin', label: 'Administration' },
+                { value: 'Peminjam', label: 'Peminjam' },
+              ]}
               onChange={(_value, option) => formEdit.setFieldValue('role', option.value)}
               radius="md"
             />
-
           </Stack>
           <Button mt={24} color="cyan" type="submit" fullWidth>
             Edit Pengguna <IconEdit size={16} style={{ marginLeft: '8px' }} color="white" />
@@ -337,7 +371,14 @@ export default function KelolaUserPage() {
         }
       >
         <Text>Apakah anda yakin ingin menghapus pengguna ini?</Text>
-        <Button mt={24} color="red" fullWidth onClick={() => { handleDeleteUser(); }}>
+        <Button
+          mt={24}
+          color="red"
+          fullWidth
+          onClick={() => {
+            handleDeleteUser();
+          }}
+        >
           Hapus Pengguna <IconTrash size={16} style={{ marginLeft: '8px' }} color="white" />
         </Button>
       </Modal>
@@ -352,34 +393,32 @@ export default function KelolaUserPage() {
           </Text>
         }
       >
-      <Grid>
-        <Grid.Col span={{ base: 12, sm: 6, lg: 9 }}>
-                <Grid>
-
-                  <Grid.Col span={{ base: 12, sm: 6 }}>
-                    <Text size="md" c="dimmed">
-                      Nama Lengkap
-                    </Text>
-                    <Text mt={8} mb={16} c="#3A3A3C" size="sm" fw={500}>
-                      {selectedUser.fullname}
-                    </Text>
-                    <Text size="md" c="dimmed">
-                      Username
-                    </Text>
-                    <Text mt={8} mb={16} c="#3A3A3C" size="sm" fw={500}>
-                      {selectedUser.username}
-                    </Text>
-                    <Text size="md" c="dimmed">
-                      Role
-                    </Text>
-                    <Text mt={8} mb={16} c="#3A3A3C" size="sm" fw={500}>
-                      {selectedUser.role}
-                    </Text>
-                  </Grid.Col>
-
-                </Grid>
-        </Grid.Col>
-      </Grid>
+        <Grid>
+          <Grid.Col span={{ base: 12, sm: 6, lg: 9 }}>
+            <Grid>
+              <Grid.Col span={{ base: 12, sm: 6 }}>
+                <Text size="md" c="dimmed">
+                  Nama Lengkap
+                </Text>
+                <Text mt={8} mb={16} c="#3A3A3C" size="sm" fw={500}>
+                  {selectedUser.fullname}
+                </Text>
+                <Text size="md" c="dimmed">
+                  Username
+                </Text>
+                <Text mt={8} mb={16} c="#3A3A3C" size="sm" fw={500}>
+                  {selectedUser.username}
+                </Text>
+                <Text size="md" c="dimmed">
+                  Role
+                </Text>
+                <Text mt={8} mb={16} c="#3A3A3C" size="sm" fw={500}>
+                  {selectedUser.role}
+                </Text>
+              </Grid.Col>
+            </Grid>
+          </Grid.Col>
+        </Grid>
       </Modal>
     </>
   );

@@ -1,4 +1,19 @@
-import { Button, Flex, Input, Table, Title, Modal, Center, Text, Grid, Paper, Divider, Stack, TextInput, Select } from '@mantine/core';
+import {
+  Button,
+  Flex,
+  Input,
+  Table,
+  Title,
+  Modal,
+  Center,
+  Text,
+  Grid,
+  Paper,
+  Divider,
+  Stack,
+  TextInput,
+  Select,
+} from '@mantine/core';
 import { IconPlus, IconSearch } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import { useEffect, useState } from 'react';
@@ -34,14 +49,19 @@ export default function PengajuanPage() {
 
   const [buildings, setBuildings] = useState([]);
   const [selectedReservation, setSelectedReservation] = useState({} as any);
-  
+
   const [users, setUsers] = useState([]);
   const handleGetBuilding = async () => {
     try {
       const response = await getBuildings();
 
       // eslint-disable-next-line max-len
-      setBuildings(response.data.map((item: { id: any; nama: any }) => ({ value: item.id.toString(), label: item.nama })));
+      setBuildings(
+        response.data.map((item: { id: any; nama: any }) => ({
+          value: item.id.toString(),
+          label: item.nama,
+        }))
+      );
     } catch (error) {
       throw new Error(error);
     }
@@ -51,11 +71,18 @@ export default function PengajuanPage() {
     try {
       const response = await getUsers();
 
-     setUsers(response.data.filter((user => user.role === 'Peminjam')).map((item: { id: any; fullname: any }) => ({ value: item.id.toString(), label: item.fullname })));
+      setUsers(
+        response.data
+          .filter((user) => user.role === 'Peminjam')
+          .map((item: { id: any; fullname: any }) => ({
+            value: item.id.toString(),
+            label: item.fullname,
+          }))
+      );
     } catch (error) {
       throw new Error(error);
-  }
-};
+    }
+  };
 
   const handleGetData = async () => {
     try {
@@ -75,45 +102,44 @@ export default function PengajuanPage() {
   const filteredData = data?.data?.filter(
     (item: { id_gedung: any; deskripsi_kegiatan: string; status: string }) =>
       (item?.id_gedung?.nama.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item?.deskripsi_kegiatan?.toLowerCase().includes(searchQuery.toLowerCase())) && item?.status.toLowerCase() === 'pending'
+        item?.deskripsi_kegiatan?.toLowerCase().includes(searchQuery.toLowerCase())) &&
+      item?.status.toLowerCase() === 'pending'
   );
 
   const handleRequestApproval = async (reservation, type) => {
     try {
-
       const payload = {
         id_reservasi: reservation.id,
-        status:  type
-      }
-
+        status: type,
+      };
 
       const response = await approveReservation(payload);
 
-      if (response.status === 200) {
+      if (response?.status === 200) {
         if (type === 'Approved') {
           notifications.show({
             title: 'Berhasil',
-            message: 'Peminjaman Berhasil Disetujui'
-          })
+            message: 'Peminjaman Berhasil Disetujui',
+          });
 
-          closeTerima()
+          closeTerima();
         }
 
         if (type === 'Rejected') {
           notifications.show({
             title: 'Berhasil',
             message: 'Peminjaman Berhasil Ditolak',
-            color: 'red'
-          })
+            color: 'red',
+          });
 
-          close()
+          close();
         }
         refetch();
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
 
   const handleRequestReservation = async () => {
     try {
@@ -121,9 +147,8 @@ export default function PengajuanPage() {
         ...form.values,
         id_gedung: parseInt(form.values.id_gedung),
         id_peminjam: parseInt(form.values.id_peminjam),
-
       });
-      if (response.status === 201) {
+      if (response?.status === 201) {
         refetch();
 
         closeCreate();
@@ -138,19 +163,14 @@ export default function PengajuanPage() {
     }
   };
 
-  const handleOpenApproval = (reservation, type) => {
-
+  const handleOpenApproval = (reservation: any, type: string) => {
     if (type === 'approve') {
       openTerima();
-
     } else if (type === 'reject') {
       open();
     }
     setSelectedReservation(reservation);
-    
-    
-  }
-  
+  };
 
   const rows = filteredData?.map(
     (item: {
@@ -174,7 +194,7 @@ export default function PengajuanPage() {
             <Button variant="light" color="gray" onClick={() => handleOpenApproval(item, 'reject')}>
               Tolak
             </Button>
-            <Button color="green"  onClick={() => handleOpenApproval(item, 'approve')}>
+            <Button color="green" onClick={() => handleOpenApproval(item, 'approve')}>
               Terima
             </Button>
           </Flex>
@@ -198,7 +218,12 @@ export default function PengajuanPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
-          <Button color="cyan" onClick={() => { openCreate(); }}>
+          <Button
+            color="cyan"
+            onClick={() => {
+              openCreate();
+            }}
+          >
             Ajukan Peminjaman <IconPlus size={16} style={{ marginLeft: '8px' }} color="white" />
           </Button>
         </Flex>
@@ -280,7 +305,11 @@ export default function PengajuanPage() {
             </Button>
           </Grid.Col>
           <Grid.Col span={6}>
-            <Button color="red"  fullWidth onClick={() => handleRequestApproval(selectedReservation, 'Rejected')}>
+            <Button
+              color="red"
+              fullWidth
+              onClick={() => handleRequestApproval(selectedReservation, 'Rejected')}
+            >
               Ya, Tolak
             </Button>
           </Grid.Col>
@@ -297,7 +326,7 @@ export default function PengajuanPage() {
           </Text>
         }
       >
-        <form >
+        <form>
           <Stack>
             <Divider />
 
@@ -325,16 +354,16 @@ export default function PengajuanPage() {
               valueFormat="DD MMM YYYY hh:mm A"
               label="Tanggal Mulai Peminjaman"
               placeholder="Pilih Tanggal Mulai Peminjaman"
-              value={form.values.start_peminjaman}
-              onChange={(value) => form.setFieldValue('start_peminjaman', value)}
+              value={form.values.start_peminjaman as any}
+              onChange={(value: any) => form.setFieldValue('start_peminjaman', value)}
             />
 
             <DateTimePicker
               valueFormat="DD MMM YYYY hh:mm A"
               label="Tanggal Akhir Peminjaman"
               placeholder="Pilih Tanggal Mulai Peminjaman"
-              value={form.values.end_peminjaman}
-              onChange={(value) => form.setFieldValue('end_peminjaman', value)}
+              value={form.values.end_peminjaman as any}
+              onChange={(value: any) => form.setFieldValue('end_peminjaman', value)}
             />
 
             <TextInput
@@ -348,7 +377,15 @@ export default function PengajuanPage() {
               radius="md"
             />
           </Stack>
-          <Button mt={24} color="cyan" type="button" onClick={() => { handleRequestReservation(); }} fullWidth>
+          <Button
+            mt={24}
+            color="cyan"
+            type="button"
+            onClick={() => {
+              handleRequestReservation();
+            }}
+            fullWidth
+          >
             Ajukan Peminjaman
           </Button>
         </form>
@@ -389,7 +426,11 @@ export default function PengajuanPage() {
             </Button>
           </Grid.Col>
           <Grid.Col span={6}>
-            <Button color="cyan"  fullWidth onClick={() => handleRequestApproval(selectedReservation, 'Approved')}>
+            <Button
+              color="cyan"
+              fullWidth
+              onClick={() => handleRequestApproval(selectedReservation, 'Approved')}
+            >
               Ya, Terima
             </Button>
           </Grid.Col>

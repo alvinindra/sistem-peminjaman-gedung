@@ -54,7 +54,7 @@ export default function KelolaUserPage() {
 
   const [buildings, setBuildings] = useState([]);
   const [selectedBuilding, setSelectedBuilding] = useState({} as any);
-  
+
   const [opened, { open, close }] = useDisclosure(false);
   const [openedDetail, { open: openDetail, close: closeDetail }] = useDisclosure(false);
   const [openedEdit, { open: openEdit, close: closeEdit }] = useDisclosure(false);
@@ -98,38 +98,47 @@ export default function KelolaUserPage() {
     }
   };
 
-  const rows = filteredData?.map(
-    (item: { id: number; nama: string; alamat: string }) => (
-      <Table.Tr key={item.id}>
-        <Table.Td tt="capitalize">{item.nama}</Table.Td>
-        <Table.Td tt="capitalize">{item.alamat}</Table.Td>
-        <Table.Td>
-          <Flex gap={8}>
-            <IconEye className="cursor-pointer" color="#3A3A3C66" onClick={() => handleSetSelected(item, 'detail')} />
-            <IconEdit className="cursor-pointer" color="#3A3A3C66" onClick={() => handleSetSelected(item, 'edit')} />
-            <IconTrash className="cursor-pointer" color="#3A3A3C66" onClick={() => handleSetSelected(item, 'delete')} />
-          </Flex>
-        </Table.Td>
-      </Table.Tr>
-    )
-  );
-
+  const rows = filteredData?.map((item: { id: number; nama: string; alamat: string }) => (
+    <Table.Tr key={item.id}>
+      <Table.Td tt="capitalize">{item.nama}</Table.Td>
+      <Table.Td tt="capitalize">{item.alamat}</Table.Td>
+      <Table.Td>
+        <Flex gap={8}>
+          <IconEye
+            className="cursor-pointer"
+            color="#3A3A3C66"
+            onClick={() => handleSetSelected(item, 'detail')}
+          />
+          <IconEdit
+            className="cursor-pointer"
+            color="#3A3A3C66"
+            onClick={() => handleSetSelected(item, 'edit')}
+          />
+          <IconTrash
+            className="cursor-pointer"
+            color="#3A3A3C66"
+            onClick={() => handleSetSelected(item, 'delete')}
+          />
+        </Flex>
+      </Table.Td>
+    </Table.Tr>
+  ));
 
   const handleCreateBuilding = async () => {
     try {
-     const response = await createBuilding({
-      nama: form.values.name,
-      alamat: form.values.alamat,
-     });
-
-     if (response.status === 201) {
-      notifications.show({
-        title: 'Berhasil menambahkan gedung',
-        message: '',
+      const response = await createBuilding({
+        nama: form.values.name,
+        alamat: form.values.alamat,
       });
-       close();
-       refetch();
-     }
+
+      if (response?.status === 201) {
+        notifications.show({
+          title: 'Berhasil menambahkan gedung',
+          message: '',
+        });
+        close();
+        refetch();
+      }
     } catch (error) {
       notifications.show({
         title: 'Gagal menambahkan gedung',
@@ -138,7 +147,6 @@ export default function KelolaUserPage() {
       });
     }
   };
-
 
   const handleEditBuilding = async () => {
     try {
@@ -150,7 +158,7 @@ export default function KelolaUserPage() {
 
       const response = await editBuilding(payload, selectedBuilding.id);
 
-      if (response.status === 200) {
+      if (response?.status === 200) {
         notifications.show({
           title: 'Gedung Berhasil Diubah',
           message: '',
@@ -170,7 +178,7 @@ export default function KelolaUserPage() {
   const handleDeleteBuilding = async () => {
     try {
       const response = await deleteBuildings({ id: selectedBuilding.id });
-      if (response.status === 204) {
+      if (response?.status === 204) {
         notifications.show({
           title: 'Gedung Berhasil Dihapus',
           message: '',
@@ -186,7 +194,6 @@ export default function KelolaUserPage() {
       });
     }
   };
-
 
   return (
     <>
@@ -232,7 +239,11 @@ export default function KelolaUserPage() {
           </Text>
         }
       >
-        <form onSubmit={form.onSubmit(() => { handleCreateBuilding(); })}>
+        <form
+          onSubmit={form.onSubmit(() => {
+            handleCreateBuilding();
+          })}
+        >
           <Stack>
             <Divider />
             <TextInput
@@ -278,7 +289,11 @@ export default function KelolaUserPage() {
           </Text>
         }
       >
-        <form onSubmit={formEdit.onSubmit(() => { handleEditBuilding(); })}>
+        <form
+          onSubmit={formEdit.onSubmit(() => {
+            handleEditBuilding();
+          })}
+        >
           <Stack>
             <Divider />
             <TextInput
@@ -371,7 +386,14 @@ export default function KelolaUserPage() {
         }
       >
         <Text>Apakah anda yakin ingin menghapus Gedung ini?</Text>
-        <Button mt={24} color="red" fullWidth onClick={() => { handleDeleteBuilding(); }}>
+        <Button
+          mt={24}
+          color="red"
+          fullWidth
+          onClick={() => {
+            handleDeleteBuilding();
+          }}
+        >
           Hapus Gedung <IconTrash size={16} style={{ marginLeft: '8px' }} color="white" />
         </Button>
       </Modal>
