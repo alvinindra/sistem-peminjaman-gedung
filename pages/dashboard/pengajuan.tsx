@@ -1,3 +1,4 @@
+/* eslint-disable radix */
 import {
   Button,
   Flex,
@@ -18,12 +19,9 @@ import { IconPlus, IconSearch } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { start } from 'repl';
 import { DateTimePicker } from '@mantine/dates';
 import { useForm } from '@mantine/form';
-import { parse } from 'path';
 import { notifications } from '@mantine/notifications';
-import { getAdminJadwal } from '@/lib/api';
 import { formatDate } from '@/lib/helper';
 import { getReservations } from '@/services/reservation/getReservations';
 import { getBuildings } from '@/services/building/getBuildings';
@@ -46,6 +44,7 @@ export default function PengajuanPage() {
   const [openedTerima, { open: openTerima, close: closeTerima }] = useDisclosure(false);
   const [openedCreate, { open: openCreate, close: closeCreate }] = useDisclosure(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [loadingApproval, setLoadingApproval] = useState(false);
 
   const [buildings, setBuildings] = useState([]);
   const [selectedReservation, setSelectedReservation] = useState({} as any);
@@ -94,7 +93,7 @@ export default function PengajuanPage() {
     }
   };
 
-  const { data, isLoading, refetch } = useQuery({
+  const { data, refetch } = useQuery({
     queryKey: ['data-pengajuan-jadwal'],
     queryFn: handleGetData,
   });
@@ -108,6 +107,7 @@ export default function PengajuanPage() {
 
   const handleRequestApproval = async (reservation, type) => {
     try {
+      setLoadingApproval(true);
       const payload = {
         id_reservasi: reservation.id,
         status: type,
@@ -138,11 +138,14 @@ export default function PengajuanPage() {
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoadingApproval(false);
     }
   };
 
   const handleRequestReservation = async () => {
     try {
+      setLoadingApproval(true);
       const response = await requestReservation({
         ...form.values,
         id_gedung: parseInt(form.values.id_gedung),
@@ -160,6 +163,8 @@ export default function PengajuanPage() {
       }
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoadingApproval(false);
     }
   };
 
@@ -309,6 +314,7 @@ export default function PengajuanPage() {
               color="red"
               fullWidth
               onClick={() => handleRequestApproval(selectedReservation, 'Rejected')}
+              loading={loadingApproval}
             >
               Ya, Tolak
             </Button>
@@ -326,7 +332,11 @@ export default function PengajuanPage() {
           </Text>
         }
       >
-        <form>
+        <form
+          onSubmit={form.onSubmit(() => {
+            handleRequestReservation();
+          })}
+        >
           <Stack>
             <Divider />
 
@@ -377,15 +387,7 @@ export default function PengajuanPage() {
               radius="md"
             />
           </Stack>
-          <Button
-            mt={24}
-            color="cyan"
-            type="button"
-            onClick={() => {
-              handleRequestReservation();
-            }}
-            fullWidth
-          >
+          <Button mt={24} color="cyan" type="submit" fullWidth loading={loadingApproval}>
             Ajukan Peminjaman
           </Button>
         </form>
@@ -430,6 +432,7 @@ export default function PengajuanPage() {
               color="cyan"
               fullWidth
               onClick={() => handleRequestApproval(selectedReservation, 'Approved')}
+              loading={loadingApproval}
             >
               Ya, Terima
             </Button>
