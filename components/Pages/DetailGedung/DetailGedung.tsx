@@ -15,12 +15,12 @@ import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { DateTimePicker } from '@mantine/dates';
 import { useParams } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { notifications } from '@mantine/notifications';
 import DetailGedungCalendar from './DetailGedungCalendar';
 import { getBuilding } from '@/services/building/getBuilding';
 import { requestReservation } from '@/services/reservation/requestReservation';
-import { useGeneralStore } from '@/stores';
+import { API_URL } from '@/lib/api';
 
 export default function DetailGedung() {
   const form = useForm({
@@ -32,17 +32,16 @@ export default function DetailGedung() {
   });
 
   const [opened, { open, close }] = useDisclosure(false);
+  const [detailGedung, setDetailGedung] = useState(null);
 
   const params = useParams();
 
-  const { profile } = useGeneralStore();
-
-  const handleGetBuilding = () => {
+  const handleGetBuilding = async () => {
     try {
       const { id } = params;
-      const response = getBuilding(id);
+      const response = await getBuilding(id);
 
-      console.log(response);
+      setDetailGedung(response.data);
     } catch (error) {
       console.error(error);
     }
@@ -73,7 +72,7 @@ export default function DetailGedung() {
   };
 
   useEffect(() => {
-    // handleGetBuilding();
+    handleGetBuilding();
   }, []);
   return (
     <>
@@ -82,9 +81,9 @@ export default function DetailGedung() {
           <Grid>
             <Grid.Col span={{ base: 12, sm: 6, lg: 3 }}>
               <Image
-                src="/img/bg-login-sistem-peminjaman-gedung2.jpeg"
+                src={`${API_URL}/${detailGedung?.building.image}`}
                 width="100%"
-                alt="Gedung Sederhana Sudirman"
+                alt={detailGedung?.building.nama}
               />
             </Grid.Col>
             <Grid.Col span={{ base: 12, sm: 6, lg: 9 }}>
@@ -99,34 +98,25 @@ export default function DetailGedung() {
                     Nama Gedung
                   </Text>
                   <Text mt={8} mb={16} c="#3A3A3C" size="sm" fw={500}>
-                    Gedung Sederhana Sudirman
+                    {detailGedung?.building.nama}
                   </Text>
                   <Text size="md" c="dimmed">
                     Lokasi Gedung
                   </Text>
                   <Text mt={8} mb={16} c="#3A3A3C" size="sm" fw={500}>
-                    Jl Jend. Sudirman
+                    {detailGedung?.building.alamat}
                   </Text>
                 </Grid.Col>
-                <Grid.Col span={{ base: 12, sm: 6 }}>
-                  <Text size="md" c="dimmed">
-                    Deskripsi Gedung
-                  </Text>
-                  <Text mt={8} mb={16} c="#3A3A3C" size="sm" fw={500}>
-                    Jumlah Ruang: 5 <br /> <br />
-                    Fasilitas:
-                    <Flex ml={24}>
-                      <ul>
-                        <li>Kursi</li>
-                        <li>Proyektor</li>
-                      </ul>
-                    </Flex>
-                    <br />
-                    Gedung tersebut adalah sebuah bangunan modern dengan arsitektur megah yang
-                    menampilkan fasad kaca berkilau, berdiri kokoh di tengah kota sebagai simbol
-                    inovasi dan kemajuan teknologi.
-                  </Text>
-                </Grid.Col>
+                {detailGedung?.building.deskripsi_gedung && (
+                  <Grid.Col span={{ base: 12, sm: 6 }}>
+                    <Text size="md" c="dimmed">
+                      Deskripsi Gedung
+                    </Text>
+                    <Text mt={8} mb={16} c="#3A3A3C" size="sm" fw={500}>
+                      {detailGedung?.building.deskripsi_gedung}
+                    </Text>
+                  </Grid.Col>
+                )}
               </Grid>
             </Grid.Col>
           </Grid>
@@ -136,7 +126,7 @@ export default function DetailGedung() {
               Ajukan Peminjaman
             </Button>
           </Flex>
-          <DetailGedungCalendar />
+          <DetailGedungCalendar reservations={detailGedung?.reservations} />
         </Card>
       </Container>
 

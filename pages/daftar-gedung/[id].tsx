@@ -1,4 +1,4 @@
-import { ReactElement, Suspense } from 'react';
+import { ReactElement } from 'react';
 import { AppShell } from '@mantine/core';
 import dynamic from 'next/dynamic';
 import LayoutNavbar from '@/components/Layout/LayoutNavbar';
@@ -10,15 +10,15 @@ const DetailGedung = dynamic(() => import('@/components/Pages/DetailGedung/Detai
 export default function DetailGedungPage() {
   return (
     <>
-        <AppShell header={{ height: 73, offset: false }} padding="md">
-          <AppShell.Header>
-            <LayoutNavbar />
-          </AppShell.Header>
+      <AppShell header={{ height: 73, offset: false }} padding="md">
+        <AppShell.Header>
+          <LayoutNavbar />
+        </AppShell.Header>
 
-          <div className="bg-gray">
-            <DetailGedung />
-          </div>
-        </AppShell>
+        <div className="bg-gray">
+          <DetailGedung />
+        </div>
+      </AppShell>
     </>
   );
 }

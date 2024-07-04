@@ -44,3 +44,34 @@
 .rbc-toolbar-label {
   font-weight: bold;
 }
+
+.rbc-button-link span {
+  display: flex;
+  margin: 0 auto;
+  text-wrap: wrap;
+  font-size: 16px;
+  font-weight: 400;
+  max-width: 40px;
+  color: #b1b1b1;
+}
+
+.rbc-today .rbc-button-link span {
+  display: flex;
+  margin: 0 auto;
+  text-wrap: wrap;
+  font-size: 16px;
+  font-weight: 700;
+  max-width: 42px;
+  color: #5272e9;
+}
+
+.rbc-label.rbc-time-header-gutter:before {
+  content: 'Week';
+  text-align: center;
+  margin: auto 0;
+}
+
+.rbc-day-slot .rbc-event,
+.rbc-day-slot .rbc-background-event {
+  flex-flow: column !important;
+}

@@ -1,18 +1,11 @@
 const now = new Date();
 
 export default [
-  /* {
-    id: 0,
-    title: 'All Day Event very long title',
-    allDay: true,
-    start: new Date(2015, 3, 0),
-    end: new Date(2015, 3, 1),
-  }, */
   {
     id: 1,
     title: 'Long Event',
-    start: new Date(2015, 3, 7),
-    end: new Date(2015, 3, 10),
+    start: new Date(2024, 7, 7),
+    end: new Date(2024, 7, 10),
   },
 
   {
@@ -128,8 +121,8 @@ export default [
   {
     id: 14,
     title: 'Today',
-    start: new Date(new Date().setHours(new Date().getHours() - 3)),
-    end: new Date(new Date().setHours(new Date().getHours() + 3)),
+    start: new Date('2024-07-05T11:01:00Z'),
+    end: new Date('2024-07-05T16:01:00Z'),
   },
   {
     id: 15,

@@ -1,8 +1,10 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
+export const API_URL = String(process.env.API_URL);
+
 export const apiClient = axios.create({
-  baseURL: String(process.env.API_URL),
+  baseURL: API_URL,
   withCredentials: false,
   headers: {
     Accept: 'application/json',
@@ -20,9 +22,7 @@ apiClient.interceptors.request.use(
     return config;
   },
 
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 export async function getDaftarGedung() {
