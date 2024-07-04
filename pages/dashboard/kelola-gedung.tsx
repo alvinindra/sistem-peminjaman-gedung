@@ -1,9 +1,10 @@
 import {
-  Badge,
   Button,
   Divider,
+  FileInput,
   Flex,
   Grid,
+  Image,
   Input,
   Modal,
   Stack,
@@ -21,12 +22,11 @@ import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { getBuildings } from '@/services/building/getBuildings';
 import { createBuilding } from '@/services/building/createBuilding';
-import { getDaftarGedung } from '@/lib/api';
 import { editBuilding } from '@/services/building/editBuilding';
 import { deleteBuildings } from '@/services/building/deleteBuilding';
-import { getBuilding } from '@/services/building/getBuilding';
 
 export default function KelolaUserPage() {
+  const [valueImage, setValueImage] = useState<File | null>(null);
   const form = useForm({
     initialValues: {
       name: '',
@@ -52,7 +52,6 @@ export default function KelolaUserPage() {
     }
   };
 
-  const [buildings, setBuildings] = useState([]);
   const [selectedBuilding, setSelectedBuilding] = useState({} as any);
 
   const [opened, { open, close }] = useDisclosure(false);
@@ -61,7 +60,7 @@ export default function KelolaUserPage() {
   const [openedDelete, { open: openDelete, close: closeDelete }] = useDisclosure(false);
 
   const [searchQuery, setSearchQuery] = useState('');
-  const { data, isLoading, isError, refetch } = useQuery({
+  const { data, refetch } = useQuery({
     queryKey: ['admin-data-gedung'],
     queryFn: handleGetBuildings,
   });
@@ -84,11 +83,12 @@ export default function KelolaUserPage() {
 
   const handleSetSelected = (building: any, type = 'detail') => {
     setSelectedBuilding(building);
+    console.log(building);
 
     if (type === 'edit') {
       formEdit.setFieldValue('name', building.nama);
       formEdit.setFieldValue('alamat', building.alamat);
-      formEdit.setFieldValue('deskripsi', building.deskripsi);
+      formEdit.setFieldValue('deskripsi', building.deskripsi_gedung);
       openEdit();
     } else if (type === 'delete') {
       openDelete();
@@ -98,37 +98,51 @@ export default function KelolaUserPage() {
     }
   };
 
-  const rows = filteredData?.map((item: { id: number; nama: string; alamat: string }) => (
-    <Table.Tr key={item.id}>
-      <Table.Td tt="capitalize">{item.nama}</Table.Td>
-      <Table.Td tt="capitalize">{item.alamat}</Table.Td>
-      <Table.Td>
-        <Flex gap={8}>
-          <IconEye
-            className="cursor-pointer"
-            color="#3A3A3C66"
-            onClick={() => handleSetSelected(item, 'detail')}
+  const rows = filteredData?.map(
+    (item: { id: number; image: string; nama: string; alamat: string }) => (
+      <Table.Tr key={item.id}>
+        <Table.Td tt="capitalize">
+          <Image
+            src={item.image ? item.image : '/img/bg-login-sistem-peminjaman-gedung2.jpeg'}
+            h={200}
+            w={320}
+            mx="auto"
+            fallbackSrc="/img/bg-login-sistem-peminjaman-gedung2.jpeg"
+            alt={item.nama}
           />
-          <IconEdit
-            className="cursor-pointer"
-            color="#3A3A3C66"
-            onClick={() => handleSetSelected(item, 'edit')}
-          />
-          <IconTrash
-            className="cursor-pointer"
-            color="#3A3A3C66"
-            onClick={() => handleSetSelected(item, 'delete')}
-          />
-        </Flex>
-      </Table.Td>
-    </Table.Tr>
-  ));
+        </Table.Td>
+        <Table.Td tt="capitalize">{item.nama}</Table.Td>
+        <Table.Td tt="capitalize">{item.alamat}</Table.Td>
+        <Table.Td>
+          <Flex gap={8}>
+            <IconEye
+              className="cursor-pointer"
+              color="#3A3A3C66"
+              onClick={() => handleSetSelected(item, 'detail')}
+            />
+            <IconEdit
+              className="cursor-pointer"
+              color="#3A3A3C66"
+              onClick={() => handleSetSelected(item, 'edit')}
+            />
+            <IconTrash
+              className="cursor-pointer"
+              color="#3A3A3C66"
+              onClick={() => handleSetSelected(item, 'delete')}
+            />
+          </Flex>
+        </Table.Td>
+      </Table.Tr>
+    )
+  );
 
   const handleCreateBuilding = async () => {
     try {
       const response = await createBuilding({
         nama: form.values.name,
         alamat: form.values.alamat,
+        deskripsi_gedung: form.values.deskripsi,
+        image: valueImage,
       });
 
       if (response?.status === 201) {
@@ -153,7 +167,8 @@ export default function KelolaUserPage() {
       const payload = {
         nama: formEdit.values.name,
         alamat: formEdit.values.alamat,
-        deskripsi: formEdit.values.deskripsi,
+        deskripsi_gedung: formEdit.values.deskripsi,
+        image: valueImage,
       };
 
       const response = await editBuilding(payload, selectedBuilding.id);
@@ -220,6 +235,7 @@ export default function KelolaUserPage() {
       >
         <Table.Thead>
           <Table.Tr className="spgp-table-header">
+            <Table.Th ta="center">Gambar Gedung</Table.Th>
             <Table.Th>Nama Gedung</Table.Th>
             <Table.Th>Alamat Gedung</Table.Th>
             {/* <Table.Th>Status</Table.Th> */}
@@ -254,7 +270,6 @@ export default function KelolaUserPage() {
               onChange={(event) => form.setFieldValue('name', event.currentTarget.value)}
               radius="md"
             />
-
             <TextInput
               required
               label="Alamat"
@@ -263,15 +278,21 @@ export default function KelolaUserPage() {
               onChange={(event) => form.setFieldValue('alamat', event.currentTarget.value)}
               radius="md"
             />
-
-            {/* <Textarea
+            <Textarea
               required
               label="Deskripsi"
               placeholder="Masukkan deskripsi"
               value={form.values.deskripsi}
               onChange={(event) => form.setFieldValue('deskripsi', event.currentTarget.value)}
               radius="md"
-            /> */}
+            />
+            <FileInput
+              accept="image/png,image/jpeg"
+              label="Unggah Gambar"
+              placeholder="Unggah gambar gedung"
+              value={valueImage}
+              onChange={setValueImage}
+            />
           </Stack>
           <Button mt={24} color="cyan" type="submit" fullWidth>
             Tambahkan Gedung <IconPlus size={16} style={{ marginLeft: '8px' }} color="white" />
@@ -314,17 +335,25 @@ export default function KelolaUserPage() {
               radius="md"
             />
 
-            {/* <Textarea
+            <Textarea
               required
               label="Deskripsi"
               placeholder="Masukkan deskripsi"
               value={formEdit.values.deskripsi}
               onChange={(event) => formEdit.setFieldValue('deskripsi', event.currentTarget.value)}
               radius="md"
-            /> */}
+            />
+
+            <FileInput
+              accept="image/png,image/jpeg"
+              label="Unggah Gambar"
+              placeholder="Unggah gambar gedung"
+              value={valueImage}
+              onChange={setValueImage}
+            />
           </Stack>
           <Button mt={24} color="cyan" type="submit" fullWidth>
-            Edit Gedung <IconPlus size={16} style={{ marginLeft: '8px' }} color="white" />
+            Edit Gedung <IconEdit size={16} style={{ marginLeft: '8px' }} color="white" />
           </Button>
         </form>
       </Modal>

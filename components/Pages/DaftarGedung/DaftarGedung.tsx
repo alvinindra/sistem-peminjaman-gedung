@@ -1,12 +1,12 @@
-import { getDaftarGedung } from '@/lib/api';
 import { Container, Grid, Input, Text, Card, Image, Skeleton, Paper } from '@mantine/core';
 import { IconSearch } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
+import { getDaftarGedung } from '@/lib/api';
 
 export default function DaftarGedung() {
   const [searchQuery, setSearchQuery] = useState('');
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['data-gedung'],
     queryFn: getDaftarGedung,
   });
@@ -84,8 +84,9 @@ export default function DaftarGedung() {
               >
                 <Card.Section>
                   <Image
-                    src="/img/bg-login-sistem-peminjaman-gedung2.jpeg"
+                    src={item.image ? item.image : '/img/bg-login-sistem-peminjaman-gedung2.jpeg'}
                     h={160}
+                    fallbackSrc="/img/bg-login-sistem-peminjaman-gedung2.jpeg"
                     alt={item.nama}
                   />
                 </Card.Section>

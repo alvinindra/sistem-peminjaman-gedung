@@ -10,18 +10,17 @@ import {
   TextInput,
   Stack,
   Modal,
-  Select,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { DateTimePicker } from '@mantine/dates';
 import { useParams } from 'next/navigation';
 import { useEffect } from 'react';
+import { notifications } from '@mantine/notifications';
 import DetailGedungCalendar from './DetailGedungCalendar';
 import { getBuilding } from '@/services/building/getBuilding';
 import { requestReservation } from '@/services/reservation/requestReservation';
 import { useGeneralStore } from '@/stores';
-import { notifications } from '@mantine/notifications';
 
 export default function DetailGedung() {
   const form = useForm({

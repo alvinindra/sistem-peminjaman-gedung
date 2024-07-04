@@ -21,15 +21,15 @@ import { useQuery } from '@tanstack/react-query';
 import { start } from 'repl';
 import { DateTimePicker } from '@mantine/dates';
 import { useForm } from '@mantine/form';
+import { parse } from 'path';
+import { notifications } from '@mantine/notifications';
 import { getAdminJadwal } from '@/lib/api';
 import { formatDate } from '@/lib/helper';
 import { getReservations } from '@/services/reservation/getReservations';
 import { getBuildings } from '@/services/building/getBuildings';
 import { requestReservation } from '@/services/reservation/requestReservation';
 import { getUsers } from '@/services/user/getUser';
-import { parse } from 'path';
 import { approveReservation } from '@/services/reservation/approveReservation';
-import { notifications } from '@mantine/notifications';
 
 export default function PengajuanPage() {
   const form = useForm({
@@ -63,7 +63,7 @@ export default function PengajuanPage() {
         }))
       );
     } catch (error) {
-      throw new Error(error);
+      console.error(error);
     }
   };
 
@@ -80,7 +80,7 @@ export default function PengajuanPage() {
           }))
       );
     } catch (error) {
-      throw new Error(error);
+      console.error(error);
     }
   };
 
@@ -90,7 +90,7 @@ export default function PengajuanPage() {
 
       return response;
     } catch (error) {
-      throw new Error(error);
+      console.error(error);
     }
   };
 
@@ -159,7 +159,7 @@ export default function PengajuanPage() {
         });
       }
     } catch (error) {
-      throw new Error(error);
+      console.error(error);
     }
   };
 

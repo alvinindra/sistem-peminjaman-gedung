@@ -9,14 +9,14 @@ import {
   Center,
 } from '@mantine/core';
 import Image from 'next/image';
-import classes from './LoginForm.module.css';
 import { useForm } from '@mantine/form';
-import { apiClient } from '@/lib/api';
 import { notifications } from '@mantine/notifications';
 import Cookies from 'js-cookie';
-import { useGeneralStore } from '@/stores';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
+import { useGeneralStore } from '@/stores';
+import { apiClient } from '@/lib/api';
+import classes from './LoginForm.module.css';
 
 export function LoginForm() {
   const router = useRouter();
@@ -61,7 +61,7 @@ export function LoginForm() {
 
   return (
     <div className={classes.wrapper}>
-      <Paper className={classes.form} radius={0} p={140}>
+      <Paper className={classes.form} radius={0} p={{ base: 32, xs: 32, md: 140, lg: 140 }}>
         <Center mb={55}>
           <Image src="/img/icon/ic-gedung.svg" width={80} height={80} alt="" />
         </Center>
