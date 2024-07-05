@@ -47,8 +47,10 @@ export default function DetailGedung() {
     }
   };
 
+  const [loadingApproval, setLoadingApproval] = useState(false);
   const handleRequestReservation = async () => {
     try {
+      setLoadingApproval(true);
       const { id } = params;
       const response = await requestReservation({
         ...form.values,
@@ -68,6 +70,7 @@ export default function DetailGedung() {
       });
     } finally {
       close();
+      setLoadingApproval(false);
     }
   };
 
@@ -180,6 +183,7 @@ export default function DetailGedung() {
               handleRequestReservation();
             }}
             fullWidth
+            loading={loadingApproval}
           >
             Ajukan Peminjaman
           </Button>

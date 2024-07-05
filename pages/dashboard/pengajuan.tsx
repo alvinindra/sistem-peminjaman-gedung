@@ -137,8 +137,14 @@ export default function PengajuanPage() {
         refetch();
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      notifications.show({
+        title: 'Terjadi kesalahan',
+        message: 'Silakan coba lagi',
+        color: 'red',
+      });
     } finally {
+      close();
       setLoadingApproval(false);
     }
   };
