@@ -22,18 +22,23 @@ export default function DetailGedungCalendar({ reservations }: any) {
   const minTime = new Date();
   minTime.setHours(9, 0, 0, 0);
 
-  const formattedReservations = reservations?.map((reservation) => ({
-    id: reservation.id,
-    title: 'Long Event',
-    start: new Date(reservation.start_peminjaman), // Months are zero-indexed in JavaScript Date object
-    end: new Date(reservation.end_peminjaman), // Adjust as needed for correct end date
-    id_gedung: reservation.id_gedung,
-    id_peminjam: reservation.id_peminjam,
-    start_peminjaman: reservation.start_peminjaman,
-    end_peminjaman: reservation.end_peminjaman,
-    deskripsi_kegiatan: reservation.deskripsi_kegiatan,
-    status: reservation.status,
-  }));
+  const formattedReservations = reservations
+    ?.filter((reservation) => {
+      const status = reservation.status.toLowerCase();
+      return status !== 'rejected' && status !== 'pending';
+    })
+    .map((reservation) => ({
+      id: reservation.id,
+      title: 'Long Event',
+      start: new Date(reservation.start_peminjaman), // Months are zero-indexed in JavaScript Date object
+      end: new Date(reservation.end_peminjaman), // Adjust as needed for correct end date
+      id_gedung: reservation.id_gedung,
+      id_peminjam: reservation.id_peminjam,
+      start_peminjaman: reservation.start_peminjaman,
+      end_peminjaman: reservation.end_peminjaman,
+      deskripsi_kegiatan: reservation.deskripsi_kegiatan,
+      status: reservation.status,
+    }));
 
   return (
     <>

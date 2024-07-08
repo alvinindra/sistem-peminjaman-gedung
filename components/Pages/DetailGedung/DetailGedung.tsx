@@ -62,11 +62,13 @@ export default function DetailGedung() {
           title: 'Berhasil mengajukan peminjaman',
           message: '',
         });
+        form.reset();
       }
     } catch (error) {
       notifications.show({
         title: 'Gagal mengajukan peminjaman',
         message: 'Silahkan coba lagi',
+        color: 'Red',
       });
     } finally {
       close();

@@ -12,13 +12,11 @@ export default function JadwalPage() {
     queryFn: getAdminJadwal,
   });
 
-  const filteredData = data?.data.Message
-    ? data?.data?.filter(
-        (item: { id_gedung: any; deskripsi_kegiatan: string; status: string }) =>
-          item?.id_gedung?.nama.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          item?.deskripsi_kegiatan?.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : [];
+  const filteredData = data?.data?.filter(
+    (item: { id_gedung: any; deskripsi_kegiatan: string; status: string }) =>
+      item?.id_gedung?.nama.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item?.deskripsi_kegiatan?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const rows = filteredData?.map(
     (item: {
