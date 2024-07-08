@@ -15,5 +15,6 @@ module.exports = {
     'import/extensions': 'off',
     'no-console': 'off',
     'consistent-return': 'off',
+    'no-unneeded-ternary': 'off',
   },
 };

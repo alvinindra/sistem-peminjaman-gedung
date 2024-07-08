@@ -139,7 +139,7 @@ export default function PengajuanPage() {
     } catch (error) {
       console.error(error);
       notifications.show({
-        title: 'Terjadi kesalahan',
+        title: 'Gagal melakukan peminjaman',
         message: 'Silakan coba lagi',
         color: 'red',
       });
@@ -169,8 +169,14 @@ export default function PengajuanPage() {
       }
     } catch (error) {
       console.error(error);
+      notifications.show({
+        title: 'Gagal mengajukan peminjaman',
+        message: 'Hubungi admin atau silakan coba lagi.',
+        color: 'red',
+      });
     } finally {
       setLoadingApproval(false);
+      form.reset();
     }
   };
 
@@ -241,7 +247,7 @@ export default function PengajuanPage() {
       </Flex>
       <Table
         stickyHeader
-        stickyHeaderOffset={60}
+        stickyHeaderOffset={0}
         verticalSpacing="sm"
         horizontalSpacing="lg"
         withTableBorder

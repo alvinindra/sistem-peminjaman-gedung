@@ -18,13 +18,14 @@ import { useDisclosure } from '@mantine/hooks';
 import { IconEdit, IconEye, IconPlus, IconSearch, IconTrash } from '@tabler/icons-react';
 import { useForm } from '@mantine/form';
 import { useEffect, useState } from 'react';
+import { notifications } from '@mantine/notifications';
 import { createUser } from '@/services/user/createUser';
 import { getUsers } from '@/services/user/getUser';
 import { editUser } from '@/services/user/editUser';
 import { deleteUser } from '@/services/user/deleteUser';
-import { notifications } from '@mantine/notifications';
 
 export default function KelolaUserPage() {
+  const [isLoading, setIsLoading] = useState(false);
   const form = useForm({
     initialValues: {
       fullname: '',
@@ -36,12 +37,14 @@ export default function KelolaUserPage() {
     },
 
     validate: {
-      email: (val) => (/^\S+@\S+$/.test(val) ? null : 'Invalid email'),
-      password: (val) => (val.length <= 6 ? 'Password should include at least 6 characters' : null),
+      email: (val) => (/^\S+@\S+$/.test(val) ? null : 'Email tidak valid'),
+      password: (val) => (val.length <= 6 ? 'Password minimal 6 karakter' : null),
       confirmPassword: (value, values) =>
-        value !== values.password ? 'Passwords did not match' : null,
+        value !== values.password ? 'Passwords tidak sama' : null,
     },
   });
+
+  console.log(form.errors);
 
   const formEdit = useForm({
     fullname: '',
@@ -57,6 +60,13 @@ export default function KelolaUserPage() {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState({} as any);
 
+  const [searchQuery, setSearchQuery] = useState('');
+  const filteredData = users?.filter(
+    (item: { fullname: string; username: string }) =>
+      item.fullname?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.username?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   const handleGetUser = async () => {
     try {
       const response = await getUsers();
@@ -69,10 +79,12 @@ export default function KelolaUserPage() {
 
   const handleAddUser = async () => {
     try {
+      setIsLoading(true);
       const payload = {
         fullname: form.values.fullname,
         username: form.values.username,
         role: form.values.role,
+        email: form.values.email,
         password: form.values.password,
       };
 
@@ -92,11 +104,15 @@ export default function KelolaUserPage() {
         message: error.response.data.message || 'Silakan coba lagi',
         color: 'red',
       });
+    } finally {
+      setIsLoading(false);
+      form.reset();
     }
   };
 
   const handleEditUser = async () => {
     try {
+      setIsLoading(true);
       const payload = {
         fullname: formEdit.values.fullname,
         username: formEdit.values.username,
@@ -119,6 +135,8 @@ export default function KelolaUserPage() {
         message: error.response.data.message || 'Silakan coba lagi',
         color: 'red',
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -149,6 +167,7 @@ export default function KelolaUserPage() {
       formEdit.setFieldValue('fullname', user.fullname);
       formEdit.setFieldValue('username', user.username);
       formEdit.setFieldValue('role', user.role);
+      formEdit.setFieldValue('email', user.email);
       openEdit();
     } else if (type === 'delete') {
       openDelete();
@@ -161,10 +180,11 @@ export default function KelolaUserPage() {
     handleGetUser();
   }, []);
 
-  const rows = users.map((user: any) => (
+  const rows = filteredData.map((user: any) => (
     <Table.Tr key={user.id}>
       <Table.Td>{user.fullname}</Table.Td>
       <Table.Td>{user.username}</Table.Td>
+      <Table.Td>{user.email}</Table.Td>
       <Table.Td>{user.role}</Table.Td>
       <Table.Td>
         <Badge variant="outline" color={user.is_active ? 'green' : 'red'}>
@@ -204,7 +224,12 @@ export default function KelolaUserPage() {
       <Flex justify="space-between" mb={24}>
         <Title size={28}>Kelola Pengguna</Title>
         <Flex gap={16}>
-          <Input placeholder="Search..." leftSection={<IconSearch size={16} />} />
+          <Input
+            placeholder="Search..."
+            leftSection={<IconSearch size={16} />}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
           <Button variant="cyan" onClick={open}>
             Tambahkan Pengguna <IconPlus size={16} style={{ marginLeft: '8px' }} color="white" />
           </Button>
@@ -212,7 +237,7 @@ export default function KelolaUserPage() {
       </Flex>
       <Table
         stickyHeader
-        stickyHeaderOffset={60}
+        stickyHeaderOffset={0}
         verticalSpacing="sm"
         horizontalSpacing="lg"
         withTableBorder
@@ -221,6 +246,7 @@ export default function KelolaUserPage() {
           <Table.Tr className="spgp-table-header">
             <Table.Th>Nama Pengguna</Table.Th>
             <Table.Th>Username</Table.Th>
+            <Table.Th>Email</Table.Th>
             <Table.Th>Role</Table.Th>
             <Table.Th>Status</Table.Th>
             <Table.Th>Aksi</Table.Th>
@@ -239,7 +265,11 @@ export default function KelolaUserPage() {
           </Text>
         }
       >
-        <form>
+        <form
+          onSubmit={form.onSubmit(() => {
+            handleAddUser();
+          })}
+        >
           <Stack>
             <Divider />
             <TextInput
@@ -249,6 +279,16 @@ export default function KelolaUserPage() {
               value={form.values.fullname}
               onChange={(event) => form.setFieldValue('fullname', event.currentTarget.value)}
               radius="md"
+            />
+
+            <TextInput
+              required
+              label="Email"
+              placeholder="Masukkan email"
+              value={form.values.email}
+              onChange={(event) => form.setFieldValue('email', event.currentTarget.value)}
+              radius="md"
+              {...form.getInputProps('email')}
             />
 
             <TextInput
@@ -281,6 +321,7 @@ export default function KelolaUserPage() {
               onChange={(event) => form.setFieldValue('password', event.currentTarget.value)}
               error={form.errors.password && 'Password should include at least 6 characters'}
               radius="md"
+              {...form.getInputProps('password')}
             />
 
             <PasswordInput
@@ -290,17 +331,10 @@ export default function KelolaUserPage() {
               value={form.values.confirmPassword}
               onChange={(event) => form.setFieldValue('confirmPassword', event.currentTarget.value)}
               radius="md"
+              {...form.getInputProps('confirmPassword')}
             />
           </Stack>
-          <Button
-            mt={24}
-            color="cyan"
-            type="button"
-            fullWidth
-            onClick={() => {
-              handleAddUser();
-            }}
-          >
+          <Button mt={24} color="cyan" type="submit" loading={isLoading} fullWidth>
             Tambahkan Pengguna <IconPlus size={16} style={{ marginLeft: '8px' }} color="white" />
           </Button>
         </form>
@@ -334,6 +368,16 @@ export default function KelolaUserPage() {
 
             <TextInput
               required
+              label="Email"
+              placeholder="Masukkan email"
+              value={formEdit.values.email}
+              onChange={(event) => formEdit.setFieldValue('email', event.currentTarget.value)}
+              radius="md"
+              disabled
+            />
+
+            <TextInput
+              required
               label="Username"
               placeholder="Masukkan username"
               value={formEdit.values.username}
@@ -354,7 +398,7 @@ export default function KelolaUserPage() {
               radius="md"
             />
           </Stack>
-          <Button mt={24} color="cyan" type="submit" fullWidth>
+          <Button mt={24} color="cyan" type="submit" fullWidth loading={isLoading}>
             Edit Pengguna <IconEdit size={16} style={{ marginLeft: '8px' }} color="white" />
           </Button>
         </form>

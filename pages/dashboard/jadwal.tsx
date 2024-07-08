@@ -1,5 +1,5 @@
 import { Badge, Flex, Input, Paper, Table, Text, Title } from '@mantine/core';
-import { IconEye, IconSearch } from '@tabler/icons-react';
+import { IconSearch } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { formatDate } from '@/lib/helper';
@@ -7,16 +7,18 @@ import { getAdminJadwal } from '@/lib/api';
 
 export default function JadwalPage() {
   const [searchQuery, setSearchQuery] = useState('');
-  const { data, isLoading } = useQuery({
+  const { data } = useQuery({
     queryKey: ['data-jadwal'],
     queryFn: getAdminJadwal,
   });
 
-  const filteredData = data?.data?.filter(
-    (item: { id_gedung: any; deskripsi_kegiatan: string; status: string }) =>
-      item?.id_gedung?.nama.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item?.deskripsi_kegiatan?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredData = data?.data.Message
+    ? data?.data?.filter(
+        (item: { id_gedung: any; deskripsi_kegiatan: string; status: string }) =>
+          item?.id_gedung?.nama.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item?.deskripsi_kegiatan?.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : [];
 
   const rows = filteredData?.map(
     (item: {
@@ -73,7 +75,7 @@ export default function JadwalPage() {
       </Flex>
       <Table
         stickyHeader
-        stickyHeaderOffset={60}
+        stickyHeaderOffset={0}
         verticalSpacing="sm"
         horizontalSpacing="lg"
         withTableBorder

@@ -27,11 +27,12 @@ import { deleteBuildings } from '@/services/building/deleteBuilding';
 
 export default function KelolaUserPage() {
   const [valueImage, setValueImage] = useState<File | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const form = useForm({
     initialValues: {
       name: '',
       alamat: '',
-      deskripsi: '',
+      deskripsi_gedung: '',
     },
   });
 
@@ -39,7 +40,7 @@ export default function KelolaUserPage() {
     initialValues: {
       name: '',
       alamat: '',
-      deskripsi: '',
+      deskripsi_gedung: '',
     },
   });
 
@@ -52,7 +53,7 @@ export default function KelolaUserPage() {
     }
   };
 
-  const [selectedBuilding, setSelectedBuilding] = useState({} as any);
+  const [selectedBuilding, setSelectedBuilding] = useState<any>();
 
   const [opened, { open, close }] = useDisclosure(false);
   const [openedDetail, { open: openDetail, close: closeDetail }] = useDisclosure(false);
@@ -71,24 +72,13 @@ export default function KelolaUserPage() {
       item.alamat.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // const handleGetDetailBuilding = async (id: number) => {
-  //   try {
-  //     const response = await getBuilding(id);
-
-  //     return response;
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // }
-
   const handleSetSelected = (building: any, type = 'detail') => {
     setSelectedBuilding(building);
-    console.log(building);
 
     if (type === 'edit') {
       formEdit.setFieldValue('name', building.nama);
       formEdit.setFieldValue('alamat', building.alamat);
-      formEdit.setFieldValue('deskripsi', building.deskripsi_gedung);
+      formEdit.setFieldValue('deskripsi_gedung', building.deskripsi_gedung);
       openEdit();
     } else if (type === 'delete') {
       openDelete();
@@ -138,10 +128,11 @@ export default function KelolaUserPage() {
 
   const handleCreateBuilding = async () => {
     try {
+      setIsLoading(true);
       const response = await createBuilding({
         nama: form.values.name,
         alamat: form.values.alamat,
-        deskripsi_gedung: form.values.deskripsi,
+        deskripsi_gedung: form.values.deskripsi_gedung,
         image: valueImage,
       });
 
@@ -159,15 +150,20 @@ export default function KelolaUserPage() {
         message: 'Silakan coba lagi',
         color: 'red',
       });
+    } finally {
+      setIsLoading(false);
+      form.reset();
+      setValueImage(null);
     }
   };
 
   const handleEditBuilding = async () => {
     try {
+      setIsLoading(true);
       const payload = {
         nama: formEdit.values.name,
         alamat: formEdit.values.alamat,
-        deskripsi_gedung: formEdit.values.deskripsi,
+        deskripsi_gedung: formEdit.values.deskripsi_gedung,
         image: valueImage,
       };
 
@@ -187,6 +183,9 @@ export default function KelolaUserPage() {
         message: error.response.data.message || 'Silakan coba lagi',
         color: 'red',
       });
+    } finally {
+      setIsLoading(false);
+      setValueImage(null);
     }
   };
 
@@ -228,7 +227,7 @@ export default function KelolaUserPage() {
       </Flex>
       <Table
         stickyHeader
-        stickyHeaderOffset={60}
+        stickyHeaderOffset={0}
         verticalSpacing="sm"
         horizontalSpacing="lg"
         withTableBorder
@@ -282,8 +281,10 @@ export default function KelolaUserPage() {
               required
               label="Deskripsi"
               placeholder="Masukkan deskripsi"
-              value={form.values.deskripsi}
-              onChange={(event) => form.setFieldValue('deskripsi', event.currentTarget.value)}
+              value={form.values.deskripsi_gedung}
+              onChange={(event) =>
+                form.setFieldValue('deskripsi_gedung', event.currentTarget.value)
+              }
               radius="md"
             />
             <FileInput
@@ -294,7 +295,7 @@ export default function KelolaUserPage() {
               onChange={setValueImage}
             />
           </Stack>
-          <Button mt={24} color="cyan" type="submit" fullWidth>
+          <Button mt={24} color="cyan" type="submit" fullWidth loading={isLoading}>
             Tambahkan Gedung <IconPlus size={16} style={{ marginLeft: '8px' }} color="white" />
           </Button>
         </form>
@@ -339,8 +340,10 @@ export default function KelolaUserPage() {
               required
               label="Deskripsi"
               placeholder="Masukkan deskripsi"
-              value={formEdit.values.deskripsi}
-              onChange={(event) => formEdit.setFieldValue('deskripsi', event.currentTarget.value)}
+              value={formEdit.values.deskripsi_gedung}
+              onChange={(event) =>
+                formEdit.setFieldValue('deskripsi_gedung', event.currentTarget.value)
+              }
               radius="md"
             />
 
@@ -366,7 +369,7 @@ export default function KelolaUserPage() {
         padding={32}
         title={
           <Text size="md" fw={600}>
-            Detail Gedung {selectedBuilding.nama}
+            Detail Gedung {selectedBuilding?.nama}
           </Text>
         }
       >
@@ -376,13 +379,13 @@ export default function KelolaUserPage() {
               Nama Gedung
             </Text>
             <Text size="md" mt={8} mb={16}>
-              {selectedBuilding.nama}
+              {selectedBuilding?.nama}
             </Text>
             <Text size="md" c="#3A3A3C99">
               Lokasi Gedung
             </Text>
             <Text size="md" mt={8} mb={16}>
-              {selectedBuilding.alamat}
+              {selectedBuilding?.alamat}
             </Text>
             {/* <Text size="md" c="#3A3A3C99">
               Deskripsi Gedung
