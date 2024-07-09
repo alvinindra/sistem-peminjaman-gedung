@@ -10,7 +10,6 @@ export const apiClient = axios.create({
     Accept: 'application/json',
     'Content-Type': 'application/json',
     'Accept-Language': 'en',
-    'ngrok-skip-browser-warning': 'true',
   },
 });
 
