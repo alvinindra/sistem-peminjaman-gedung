@@ -21,6 +21,7 @@ import DetailGedungCalendar from './DetailGedungCalendar';
 import { getBuilding } from '@/services/building/getBuilding';
 import { requestReservation } from '@/services/reservation/requestReservation';
 import { API_URL } from '@/lib/api';
+import { useGeneralStore } from '@/stores';
 
 export default function DetailGedung() {
   const form = useForm({
@@ -33,6 +34,7 @@ export default function DetailGedung() {
 
   const [opened, { open, close }] = useDisclosure(false);
   const [detailGedung, setDetailGedung] = useState(null);
+  const { profile } = useGeneralStore((state) => state);
 
   const params = useParams();
 
@@ -55,6 +57,7 @@ export default function DetailGedung() {
       const response = await requestReservation({
         ...form.values,
         id_gedung: id,
+        id_peminjam: profile.user_id,
       });
 
       if (response?.status === 201) {
